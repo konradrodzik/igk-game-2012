@@ -11,5 +11,12 @@ public:
 	LAYER_NODE_FUNC(MenuScene);
 
 	virtual void ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent);
+	void onItemClick(CCObject* sender);
+	void createMainMenu();
+	void mainMenuEnterAnimation();
+	void onEnter();
+
+private:
+	CCMenu* mainMenu;
 };
 
