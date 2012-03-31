@@ -46,6 +46,12 @@
     <ClInclude Include="Classes\HelloWorldScene.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="Classes\WelcomeScene.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\MenuScene.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="win32\main.cpp">
@@ -55,6 +61,12 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Classes\HelloWorldScene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\WelcomeScene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\MenuScene.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

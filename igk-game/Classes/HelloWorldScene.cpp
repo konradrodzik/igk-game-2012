@@ -83,6 +83,8 @@ bool HelloWorld::init()
         // Add the sprite to HelloWorld layer as a child layer.
         this->addChild(pSprite, 0);
 
+		this->setIsTouchEnabled(true);
+
         bRet = true;
     } while (0);
 
@@ -93,5 +95,17 @@ void HelloWorld::menuCloseCallback(CCObject* pSender)
 {
     // "close" menu item clicked
     CCDirector::sharedDirector()->end();
+}
+
+void HelloWorld::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
+{
+	CCSprite* pSprite = CCSprite::spriteWithFile("HelloWorld.png");
+
+	CCTouch* touch = (CCTouch*)pTouches->anyObject();
+	pSprite->setPosition(CCDirector::sharedDirector()->convertToGL(touch->locationInView(touch->view())));
+	//pSprite->setContentSize(CCSizeMake(50, 50));
+	addChild(pSprite);
+
+	pSprite->runAction(CCRotateBy::actionWithDuration(CCRANDOM_0_1() * 10 + 10, 360));
 }
 
