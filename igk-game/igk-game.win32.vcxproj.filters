@@ -35,6 +35,9 @@
     <None Include="Resources\HelloWorld.png">
       <Filter>resource</Filter>
     </None>
+    <None Include="Resources\sun.jpg">
+      <Filter>resource</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="win32\igk-game.rc">
@@ -63,6 +66,9 @@
     <ClInclude Include="Sun.h">
       <Filter>Classes\Gameplay</Filter>
     </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Classes\Gameplay</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Classes\MenuScene.cpp">
@@ -81,6 +87,9 @@
       <Filter>other</Filter>
     </ClCompile>
     <ClCompile Include="Sun.cpp">
+      <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
       <Filter>Classes\Gameplay</Filter>
     </ClCompile>
   </ItemGroup>

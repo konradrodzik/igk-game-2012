@@ -29,6 +29,17 @@ CCScene* Gameplay::scene()
 	return scene;
 }
 
+bool Gameplay::init() 
+{
+	CCSize size = CCDirector::sharedDirector()->getWinSize();
+
+	sun = new Sun();
+	sun->setPosition(ccp(-sun->getContentSize().width/2 + 300, size.height / 2));
+	addChild(sun);
+
+	return true;
+}
+
 void Gameplay::update(ccTime dt) {
 
 }
