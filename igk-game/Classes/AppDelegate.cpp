@@ -5,7 +5,7 @@
 using namespace CocosDenshion;
 
 
-#include "HelloWorldScene.h"
+#include "Gameplay.h"
 #include "WelcomeScene.h"
 
 #include "CCEGLView.h"
@@ -32,7 +32,7 @@ bool AppDelegate::initInstance()
 		// The HelloWorld is designed as HVGA.
 		CCEGLView * pMainWnd = new CCEGLView();
 		CC_BREAK_IF(! pMainWnd
-				|| ! pMainWnd->Create(TEXT("cocos2d: Hello World"), 800, 600));
+				|| ! pMainWnd->Create(TEXT("cocos2d: Hello World"), 1024, 768));
 
 #endif  // CC_PLATFORM_WIN32
 
@@ -117,7 +117,7 @@ bool AppDelegate::applicationDidFinishLaunching()
     pDirector->setAnimationInterval(1.0 / 60);
 
     // create a scene. it's an autorelease object
-	CCScene *pScene = WelcomeScene::scene(); //HelloWorld::scene();
+	CCScene *pScene = Gameplay::scene(); //WelcomeScene::scene();
 
     // run
     pDirector->runWithScene(pScene);

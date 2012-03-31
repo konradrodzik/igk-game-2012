@@ -1,5 +1,5 @@
 #include "MenuScene.h"
-#include "HelloWorldScene.h"
+#include "Gameplay.h"
 
 using namespace cocos2d;
 
@@ -51,5 +51,5 @@ bool MenuScene::init()
 
 void MenuScene::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 {
-	CCDirector::sharedDirector()->replaceScene(CCTransitionMoveInR::transitionWithDuration(0.5f, HelloWorld::scene()));
+	CCDirector::sharedDirector()->replaceScene(CCTransitionMoveInR::transitionWithDuration(0.5f, Gameplay::scene()));
 }

@@ -14,9 +14,6 @@
     <Filter Include="Classes\WelcomeScene">
       <UniqueIdentifier>{b780fc0a-0704-4b71-9e28-92f953eec819}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Classes\HelloWorldScene">
-      <UniqueIdentifier>{9e153be6-aca1-4e83-b674-c88cf0426127}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Classes\Gameplay">
       <UniqueIdentifier>{6448129a-192d-4013-985e-3efe38c8d3ef}</UniqueIdentifier>
     </Filter>
@@ -54,9 +51,6 @@
     <ClInclude Include="Classes\WelcomeScene.h">
       <Filter>Classes\WelcomeScene</Filter>
     </ClInclude>
-    <ClInclude Include="Classes\HelloWorldScene.h">
-      <Filter>Classes\HelloWorldScene</Filter>
-    </ClInclude>
     <ClInclude Include="Classes\Gameplay.h">
       <Filter>Classes\Gameplay</Filter>
     </ClInclude>
@@ -65,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="win32\main.h">
       <Filter>other</Filter>
+    </ClInclude>
+    <ClInclude Include="Sun.h">
+      <Filter>Classes\Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -77,14 +74,14 @@
     <ClCompile Include="Classes\WelcomeScene.cpp">
       <Filter>Classes\WelcomeScene</Filter>
     </ClCompile>
-    <ClCompile Include="Classes\HelloWorldScene.cpp">
-      <Filter>Classes\HelloWorldScene</Filter>
-    </ClCompile>
     <ClCompile Include="Classes\Gameplay.cpp">
       <Filter>Classes\Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="win32\main.cpp">
       <Filter>other</Filter>
+    </ClCompile>
+    <ClCompile Include="Sun.cpp">
+      <Filter>Classes\Gameplay</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
