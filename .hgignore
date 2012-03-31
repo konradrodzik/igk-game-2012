@@ -67,3 +67,4 @@ Device-Release/
 *.ipch
 *.sdf
 *.o
+*.opensdf
