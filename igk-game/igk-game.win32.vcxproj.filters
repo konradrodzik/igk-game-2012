@@ -21,6 +21,9 @@
       <UniqueIdentifier>{f30bfaa4-366b-44e3-82b7-80dd4a128c3a}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
     </Filter>
+    <Filter Include="Classes\Utils">
+      <UniqueIdentifier>{dc935072-cb70-4e15-96a9-06ad4de6c044}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\res\igk-game.ico">
@@ -70,7 +73,10 @@
       <Filter>Classes\Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="Planet.h">
-      <Filter>include</Filter>
+      <Filter>Classes\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="GLES-Render.h">
+      <Filter>Classes\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +100,12 @@
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Planet.cpp">
+      <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="GLES-Render.cpp">
+      <Filter>Classes\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

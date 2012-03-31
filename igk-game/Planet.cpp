@@ -19,3 +19,10 @@ CCSprite* Planet::getSprite()
 	return planetSprite;
 }
 
+void Planet::setPos( CCPoint pos )
+{
+	if(planetSprite) {
+		planetSprite->setPosition(pos);
+	}
+}
+
