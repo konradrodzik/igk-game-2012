@@ -136,6 +136,7 @@
     <ClInclude Include="Classes\HelloWorldScene.h" />
     <ClInclude Include="Classes\WelcomeScene.h" />
     <ClInclude Include="Classes\MenuScene.h" />
+    <ClInclude Include="Planet.h" />
     <ClInclude Include="win32\main.h" />
     <ClInclude Include="win32\resource.h" />
   </ItemGroup>
@@ -145,6 +146,7 @@
     <ClCompile Include="Classes\HelloWorldScene.cpp" />
     <ClCompile Include="Classes\WelcomeScene.cpp" />
     <ClCompile Include="Classes\MenuScene.cpp" />
+    <ClCompile Include="Planet.cpp" />
     <ClCompile Include="win32\main.cpp" />
   </ItemGroup>
   <ItemGroup>
