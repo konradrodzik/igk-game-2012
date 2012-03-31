@@ -133,18 +133,18 @@
   <ItemGroup>
     <ClInclude Include="Classes\AppDelegate.h" />
     <ClInclude Include="Classes\Gameplay.h" />
-    <ClInclude Include="Classes\HelloWorldScene.h" />
     <ClInclude Include="Classes\WelcomeScene.h" />
     <ClInclude Include="Classes\MenuScene.h" />
+    <ClInclude Include="Sun.h" />
     <ClInclude Include="win32\main.h" />
     <ClInclude Include="win32\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Classes\AppDelegate.cpp" />
     <ClCompile Include="Classes\Gameplay.cpp" />
-    <ClCompile Include="Classes\HelloWorldScene.cpp" />
     <ClCompile Include="Classes\WelcomeScene.cpp" />
     <ClCompile Include="Classes\MenuScene.cpp" />
+    <ClCompile Include="Sun.cpp" />
     <ClCompile Include="win32\main.cpp" />
   </ItemGroup>
   <ItemGroup>

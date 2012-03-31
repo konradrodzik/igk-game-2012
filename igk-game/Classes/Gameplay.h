@@ -5,10 +5,14 @@
 
 using namespace cocos2d;
 
-class Gameplay : public cocos2d::CCScene {
+class Gameplay : public cocos2d::CCLayer {
+public:
 	Gameplay();
 
 	~Gameplay();
+
+	static CCScene* scene();
+	LAYER_NODE_FUNC(Gameplay);
 
 	void update(ccTime dt);
 };
