@@ -136,6 +136,8 @@
     <ClInclude Include="Classes\Gameplay.h" />
     <ClInclude Include="Classes\WelcomeScene.h" />
     <ClInclude Include="Classes\MenuScene.h" />
+    <ClInclude Include="GLES-Render.h" />
+    <ClInclude Include="Planet.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Sun.h" />
     <ClInclude Include="win32\main.h" />
@@ -146,6 +148,8 @@
     <ClCompile Include="Classes\Gameplay.cpp" />
     <ClCompile Include="Classes\WelcomeScene.cpp" />
     <ClCompile Include="Classes\MenuScene.cpp" />
+    <ClCompile Include="GLES-Render.cpp" />
+    <ClCompile Include="Planet.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Sun.cpp" />
     <ClCompile Include="win32\main.cpp" />
