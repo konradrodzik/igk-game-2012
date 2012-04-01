@@ -11,5 +11,11 @@ public:
 	LAYER_NODE_FUNC(WelcomeScene);
 
 	virtual void ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent);
+
+
+	void onEnterTransitionDidFinish();
+
+	CCSprite* title;
+	CCSprite* text;
 };
 
