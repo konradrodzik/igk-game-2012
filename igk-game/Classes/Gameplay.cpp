@@ -332,7 +332,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	float t2 = 1.0f - exp(- dt / 0.25f);
 
 	mPlayer->mOptimizedPos = ccpLerp(mPlayer->mOptimizedPos, pos, t1);
-	mPlayer->mOptimizedPos2 = ccpLerp(mPlayer->mOptimizedPos2, pos, t1);
+	mPlayer->mOptimizedPos2 = ccpLerp(mPlayer->mOptimizedPos2, pos, t2);
 
 	mPlayer->mPlayer->setPosition(mPlayer->mOptimizedPos2);
 
