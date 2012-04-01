@@ -7,12 +7,11 @@ CCParticleSystemQuad* ParticleFactory::explosion()
 	return particle;
 }
 
-CCParticleMeteor* ParticleFactory::meteor()
+CCParticleSystem* ParticleFactory::meteor()
 {
 	CCParticleMeteor* particle = CCParticleMeteor::node();
-	particle->setIsAutoRemoveOnFinish(true);
+	//particle->setIsAutoRemoveOnFinish(true);
 	particle->setTexture( CCTextureCache::sharedTextureCache()->addImage("fire.png") );
-
 	return particle;
 }
 
@@ -30,5 +29,11 @@ CCParticleSun* ParticleFactory::sun()
 	CCParticleSun* particle = CCParticleSun::node();
 	particle->setTexture( CCTextureCache::sharedTextureCache()->addImage("fire.png") );
 
+	return particle;
+}
+
+CCParticleSystem *ParticleFactory::stars()
+{
+	CCParticleSystem *particle = CCParticleSystem::particleWithFile("Stars.plist");
 	return particle;
 }

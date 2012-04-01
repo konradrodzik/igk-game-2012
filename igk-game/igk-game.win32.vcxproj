@@ -149,6 +149,7 @@
     <None Include="Resources\space.png" />
     <None Include="Resources\Spiral.plist" />
     <None Include="Resources\stars-grayscale.png" />
+    <None Include="Resources\Stars.plist" />
     <None Include="Resources\stars.png" />
     <None Include="Resources\stars2-grayscale.png" />
     <None Include="Resources\stars2.png" />
@@ -156,6 +157,7 @@
     <None Include="Resources\sun.jpg" />
     <None Include="Resources\sun.png" />
     <None Include="Resources\sun_static.png" />
+    <None Include="Resources\trail.plist" />
     <None Include="Resources\Upsidedown.plist" />
     <None Include="win32\res\igk-game.ico" />
   </ItemGroup>
