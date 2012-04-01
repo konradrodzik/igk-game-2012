@@ -13,6 +13,7 @@ public:
 	CCSprite* getSprite();
 
 	void setPos(CCPoint pos);
+	void setAngle(float angle);
 private:
 	CCSprite* planetSprite;
 	float gravityRadius;

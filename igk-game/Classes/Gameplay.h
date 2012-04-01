@@ -31,8 +31,13 @@ public:
 	void updatePhysic(ccTime dt);
 
 	void update(ccTime dt);
+
+	void updatePlanets(ccTime dt);
+	void removePlanet(int i);
+	bool outsideView(const CCPoint &pos, float* distance = NULL, b2Vec2* normalized = NULL);
+	bool hasPlanetsNear(const CCPoint &pos, float radius);
 	
-	void addPlanet(std::string planetSpriteName, CCPoint position);
+	Planet* addPlanet(std::string planetSpriteName, CCPoint position);
 
 	void clearLevel();
 
@@ -45,6 +50,7 @@ private:
 	Player* mPlayer;
 	CCNode* world;
 	Sun* sun;
+	CCLabelTTF* playerPos;
 };
 
 #endif
