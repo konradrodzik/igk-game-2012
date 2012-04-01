@@ -3,6 +3,8 @@
 
 Player::Player(void)
 {
+score = 0;
+
 	mLastPos = CCPoint(0,0);
 	mLastVel = CCPoint(0,0);
 	mOptimizedVel = CCPoint(0,0);
