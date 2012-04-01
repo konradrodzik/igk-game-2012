@@ -31,6 +31,7 @@ public:
 
 	void update(ccTime dt);
 
+
 	void updatePlanets(ccTime dt);
 	void removePlanet(int i);
 	bool outsideView(const CCPoint &pos, float* distance = NULL, b2Vec2* normalized = NULL);
@@ -43,6 +44,8 @@ public:
 	void draw();
 
 	virtual void ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent);
+	void removeAchievement(CCNode *label);
+	void showAchievement(const char*);
 
 private:
 	CCSprite* mBackground;
@@ -52,6 +55,7 @@ private:
 	CCNode* world;
 	Sun* sun;
 	CCLabelTTF* playerPos;
+	CCParticleSystem *trail;
 };
 
 #endif

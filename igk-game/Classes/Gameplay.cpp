@@ -1,4 +1,4 @@
-#include "Gameplay.h"
+﻿#include "Gameplay.h"
 #include "Input.h"
 
 #define PTM_RATIO (1.0f/32.0f)
@@ -79,9 +79,16 @@ bool Gameplay::init()
 	//addPlanet("planet_02.png", ccp(500, 200));
 	//addPlanet("planet_03.png", ccp(500, 300));
 
-
+	//CCParticleSystem *particleSystem = ParticleFactory::stars();
+	//particleSystem->setPosition(screenSize.width / 2, screenSize.height / 2);
+	//world->addChild(particleSystem, 1);
+	trail = ParticleFactory::meteor(); 
+	trail->setPositionType(kCCPositionTypeRelative);
+	trail->setPosition(mPlayer->mPlayer->getPosition());
+	world->addChild(trail, 1);
 	return true;
 }
+
 
 void Gameplay::initPhysicalWorld()
 {
@@ -306,6 +313,8 @@ void Gameplay::update(ccTime dt) {
 	playerPos->setString(buf);
 
 	updatePhysic(dt);
+
+ 	trail->setPosition(mPlayer->mPlayer->getPosition());
 }
 
 void Gameplay::createPlayer(float posx, float posy)
@@ -315,7 +324,7 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer = new Player;
 	mPlayer->mPlayer = CCSprite::spriteWithFile("astro.png");
 	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
-	world->addChild(mPlayer->mPlayer);
+	world->addChild(mPlayer->mPlayer, 3);
 
 	// PHYSICAL REPRESENTATION
 	b2BodyDef bodyDef;
@@ -421,5 +430,31 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	CCParticleSystem* particle = ParticleFactory::explosion();
 	particle->setPosition(p);
 	world->addChild(particle, 1);
+
+	this->showAchievement("Obj-C >> C++");
 }
 
+void Gameplay::removeAchievement(CCNode *label) 
+{
+	label->removeFromParentAndCleanup(true);
+}
+
+void Gameplay::showAchievement(const char *achievementName)
+{
+	CCSize size = CCDirector::sharedDirector()->getWinSize();
+	CCLabelTTF *label = CCLabelTTF::labelWithString(achievementName, "Comic Sans", 32);
+	label->setPosition(ccp(size.width * 0.5f, size.height * 0.5f));
+	label->setColor(ccc3(128,255, 0));
+	this->addChild(label, 4);
+
+	CCFadeIn *fadeIn = CCFadeIn::actionWithDuration(0.2f);
+	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(0.35f, 4, 4);
+	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(0.2f, rand() % 90 - 45);
+	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(0.35f);
+	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
+
+	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, rotateBy, NULL);
+	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, scaleBy, NULL);
+	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, spawn2, callFunc, NULL);
+	label->runAction(sequence);
+}
