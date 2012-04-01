@@ -41,7 +41,7 @@ public:
 
 	void update(ccTime dt);
 
-
+	void showGameOver();
 	void updatePlanets(ccTime dt);
 	void updateTrash(ccTime dt);
 	void removePlanet(int i);
@@ -76,6 +76,7 @@ private:
 	CCLabelTTF* playerPos;
 	Listener *listener;
 	CCSprite* cursor;
+	int gameIsPlaying;
 
 	float impulseTimer;
 

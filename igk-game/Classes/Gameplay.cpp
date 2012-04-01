@@ -43,6 +43,7 @@ CCScene* Gameplay::scene()
 
 bool Gameplay::init() 
 {
+	gameIsPlaying = 1;
 	CocosDenshion::SimpleAudioEngine::sharedEngine()->preloadEffect("explosion.mp3");
 	setIsTouchEnabled(true);
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
@@ -775,6 +776,9 @@ void Gameplay::removeAchievement(CCNode *label)
 
 void Gameplay::showAchievement(const char *achievementName)
 {
+	if (!gameIsPlaying) {
+		return;
+	}
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 	CCLabelTTF *label = CCLabelTTF::labelWithString(achievementName, "Comic Sans", 48);
 	label->setPosition(ccp(size.width * 0.5f, size.height * 0.5f));
@@ -788,6 +792,35 @@ void Gameplay::showAchievement(const char *achievementName)
 	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
 	CCDelayTime *delayTime = CCDelayTime::actionWithDuration(0.2f);
 
+	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, NULL);
+	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
+	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
+	label->runAction(sequence);
+}
+
+void Gameplay::showGameOver()
+{
+	if (!gameIsPlaying) {
+		return;
+	}
+	unscheduleUpdate();
+	gameIsPlaying = 0;
+	CCLayerColor *layer = new CCLayerColor();
+	layer->initWithColor(ccc4(40, 40, 40, 255));
+	CCSize size = CCDirector::sharedDirector()->getWinSize();
+	CCLabelTTF *label = CCLabelTTF::labelWithString("GAME OVER", "Comic Sans", 72);
+	label->setPosition(ccp(size.width * 0.5f, size.height * 0.5f));
+	label->setColor(ccc3(128,255, 0));
+	this->addChild(layer);
+	layer->addChild(label, 4);
+
+	CCFadeIn *fadeIn = CCFadeIn::actionWithDuration(0.2f);
+	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(1.0f, 4, 4);
+	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(1.0f, rand() % 60 - 30);
+	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(1.0f);
+	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
+	CCDelayTime *delayTime = CCDelayTime::actionWithDuration(0.2f);
+	
 	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, NULL);
 	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
 	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
