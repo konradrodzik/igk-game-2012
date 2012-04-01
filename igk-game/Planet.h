@@ -1,10 +1,11 @@
 #pragma once
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
+#include "Player.h"
 
 using namespace cocos2d;
 
-class Planet {
+class Planet : public BaseObject {
 public:
 	Planet(std::string planetSpriteName);
 
@@ -26,7 +27,7 @@ public:
 	b2Fixture* mPlanetFixture;
 };
 
-class Trash {
+class Trash : public BaseObject {
 public:
 	Trash(std::string trashSpriteName);
 
@@ -40,4 +41,23 @@ public:
 	CCSprite* trashSprite;
 	b2Body* mTrashBody;
 	b2Fixture* mTrashFixture;
+};
+
+// class CCParticleSystem;
+
+class Rocket : public BaseObject {
+public:
+	Rocket(std::string trashSpriteName);
+
+	~Rocket();
+
+	CCSprite* getSprite();
+
+	void setPos(CCPoint pos);
+	void setAngle(float angle);
+
+	CCSprite* rocketSprite;
+	b2Body* mRocketBody;
+	b2Fixture* mRocketFixture;
+	CCParticleSystem* mRocketTrail;
 };
