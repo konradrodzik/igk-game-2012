@@ -14,6 +14,8 @@ const float BoundsDistance = 1640.0f;
 Gameplay::Gameplay() {
 	impulseFuel = 100;
 	drainImpulseFuel = false;
+	nextRocketTimer = 0;
+	gayplay = this;
 }
 
 Gameplay::~Gameplay() {
@@ -220,6 +222,63 @@ bool Gameplay::hasPlanetsNear(const CCPoint &pos, float radius)
 			return true;
 	}
 	return false;
+}
+
+void Gameplay::updateRockets(ccTime dt)
+{
+	for(int i = mRockets.size(); i-- > 0; ) 
+	{
+		Rocket* rocket = mRockets[i];
+		b2Vec2 rocketCenter = rocket->mRocketBody->GetPosition();
+		CCPoint rocketScreen(rocketCenter.x / PTM_RATIO, rocketCenter.y / PTM_RATIO);
+
+		float dist = 1.0f;
+		b2Vec2 normalized;
+
+		if(outsideView(rocketScreen, &dist, &normalized))
+		{
+			CCParticleSystemQuad* quad = ParticleFactory::explosion();
+			quad->setPosition(rocketScreen);
+			quad->setDuration(0.4f);
+			world->addChild(quad);
+						
+			removeRocket(i);
+			continue;
+		}
+
+		rocket->setPos(rocketScreen);
+		rocket->setAngle(rocket->mRocketBody->GetAngle() / M_PI * 180.0f);
+
+		// dist *= 1.0f - exp(- dist / dt);
+
+		dist *= 3.0f;
+		dist += 0.8f;
+
+		float force = 50.0f / (dist);
+
+		normalized.x *= force;
+		normalized.y *= force;
+
+		rocket->mRocketBody->ApplyForceToCenter(normalized);
+		rocket->mRocketTrail->setPosition(rocketScreen);
+
+		for(int i = 0; i < mPlanets.size(); ++i)
+		{
+			Planet* planet = mPlanets[i];
+			b2Vec2 planetCenter = planet->mPlanetBody->GetPosition();
+			CCPoint planetScreen(planetCenter.x / PTM_RATIO, planetCenter.y / PTM_RATIO);
+			float distance = ccpDistance(rocketScreen, planetScreen);
+
+			if(distance > planet->maxGravityRadius)
+				continue;
+
+			distance /= planet->maxGravityRadius;
+
+			CCPoint velocity = ccpNormalize(ccpSub(planetScreen, rocketScreen));
+
+			rocket->mRocketBody->ApplyForceToCenter(10.0f / distance / distance * b2Vec2(velocity.x, velocity.y));
+		}
+	}
 }
 
 void Gameplay::updateTrash(ccTime dt)
@@ -434,6 +493,7 @@ void Gameplay::updatePhysic( ccTime dt )
 
 	updatePlanets(dt);
 	updateTrash(dt);
+	updateRockets(dt);
 
 	mWorld->Step(dt, velocityIterations, positionIterations);
 
@@ -539,6 +599,7 @@ void Gameplay::updatePhysic( ccTime dt )
 
 void Gameplay::update(ccTime dt) {
 	impulseTimer += dt;
+	nextRocketTimer += dt;
 	updateScore();
 	if(drainImpulseFuel) {
 		impulseFuel -= dt * 20;
@@ -578,6 +639,18 @@ void Gameplay::update(ccTime dt) {
 	if(Input::instance()->keyDown(VK_RIGHT)) {
 		mPlayer->mPlayer->setPositionX(mPlayer->mPlayer->getPositionX() + 100 * dt);
 	}
+
+	if(GetAsyncKeyState(VK_RBUTTON)) 
+	{
+		if(nextRocketTimer >= 0)
+		{
+			float angle = mPlayer->mPlayer->getRotation() * M_PI / 180.0f;
+			float speed = 500.0f;
+			addRocket("rocket.png", mPlayer->mPlayer->getPosition(), CCPoint(speed * sinf(angle), speed * cosf(angle)));
+			nextRocketTimer = -5;
+		}
+	}
+
 
 	CCPoint sub = ccpSub(mPlayer->mOptimizedPos, sun->getPosition());
 	float angle =  CC_RADIANS_TO_DEGREES(ccpToAngle(sub));
@@ -619,6 +692,7 @@ void Gameplay::createPlayer(float posx, float posy)
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
 	fixtureDef.restitution = 0.5f;
+	fixtureDef.userData = mPlayer;
 	b2Fixture* playerFixture = body->CreateFixture(&fixtureDef);
 
 	mPlayer->mPlayerBody = body;
@@ -642,6 +716,41 @@ void Gameplay::removePlanet(int i)
 	if(i + 1 < mPlanets.size())
 		mPlanets[i] = mPlanets.back();
 	mPlanets.pop_back();
+}
+
+void Gameplay::removeRocket(int i)
+{
+	if(i < 0 || i >= mRockets.size())
+		return;
+
+	if(mRockets[i]) {
+		world->removeChild(mRockets[i]->mRocketTrail, true);
+		world->removeChild(mRockets[i]->getSprite(), true);
+		mWorld->DestroyBody(mRockets[i]->mRocketBody);
+		delete mRockets[i];
+		mRockets[i] = NULL;
+	}
+
+	if(i + 1 < mRockets.size())
+		mRockets[i] = mRockets.back();
+	mRockets.pop_back();
+}
+
+void Gameplay::removeTrash(int i)
+{
+	if(i < 0 || i >= mTrashes.size())
+		return;
+
+	if(mTrashes[i]) {
+		world->removeChild(mTrashes[i]->getSprite(), true);
+		mWorld->DestroyBody(mTrashes[i]->mTrashBody);
+		delete mTrashes[i];
+		mTrashes[i] = NULL;
+	}
+
+	if(i + 1 < mTrashes.size())
+		mTrashes[i] = mTrashes.back();
+	mTrashes.pop_back();
 }
 
 Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
@@ -672,6 +781,7 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	fd.density = 1000.0f;
 	fd.restitution = 1.0f;
 	fd.friction = 0.0f;
+	fd.userData = planet;
 	b2Fixture* planetFixture = planetBody->CreateFixture(&fd);
 
 	planet->mPlanetBody = planetBody;
@@ -680,9 +790,55 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	return planet;
 }
 
+Rocket* Gameplay::addRocket( std::string rocketSpriteName, CCPoint position,  CCPoint velocity )
+{
+	float scale = 0.4f;
+	Rocket* rocket = new Rocket(rocketSpriteName);
+	rocket->setPos(position);
+	rocket->getSprite()->setScale(scale);
+	world->addChild(rocket->getSprite());
+	
+	rocket->mRocketTrail = ParticleFactory::meteor(); 
+	rocket->mRocketTrail->setPositionType(kCCPositionTypeRelative);
+	rocket->mRocketTrail->setPosition(mPlayer->mPlayer->getPosition());
+	rocket->mRocketTrail->setDuration(20.0f);
+	world->addChild(rocket->mRocketTrail, 1);
+
+	mRockets.push_back(rocket);
+
+	// Physical representation
+
+	b2BodyDef rocketBodyDef;
+	rocketBodyDef.type = b2_dynamicBody;
+	rocketBodyDef.position.Set(position.x*PTM_RATIO, position.y*PTM_RATIO);
+	rocketBodyDef.angle = -atan2f(velocity.y, velocity.x);
+	rocketBodyDef.userData = rocket;
+	b2Body* rocketBody = mWorld->CreateBody(&rocketBodyDef);
+
+	b2CircleShape shape;
+	shape.m_radius = scale * rocket->getSprite()->getContentSize().width / 2 * PTM_RATIO;
+	//shape.m_p.Set(8.0f, 8.0f);
+	b2FixtureDef fd;
+	fd.shape = &shape;
+	fd.density = 1000.0f;
+	fd.restitution = 1.0f;
+	fd.friction = 0.0f;
+	fd.userData = rocket;
+	b2Fixture* rocketFixture = rocketBody->CreateFixture(&fd);
+
+	rocket->mRocketBody = rocketBody;
+	rocket->mRocketFixture = rocketFixture;
+
+	rocketBody->SetLinearVelocity(b2Vec2(velocity.x * PTM_RATIO, velocity.y * PTM_RATIO));
+
+	return rocket;
+}
+
 void Gameplay::clearLevel()
 {
 	while(mPlanets.size())
+		removePlanet(0);
+	while(mTrashes.size())
 		removePlanet(0);
 	mPlanets.clear();
 }
@@ -774,6 +930,11 @@ void Gameplay::removeAchievement(CCNode *label)
 {
 	label->removeFromParentAndCleanup(true);
 }
+	
+void Gameplay::collide(Rocket* rocket, Trash* trash)
+{
+
+}
 
 void Gameplay::showAchievement(const char *achievementName)
 {
@@ -798,6 +959,7 @@ void Gameplay::showAchievement(const char *achievementName)
 	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
 	label->runAction(sequence);
 }
+Gameplay* Gameplay::gayplay;
 
 void Gameplay::showGameOver()
 {
@@ -830,7 +992,27 @@ void Gameplay::showGameOver()
 
 void Listener::BeginContact(b2Contact* contact)
 {
+	BaseObject* a = (BaseObject*)contact->GetFixtureA()->GetUserData();
+	BaseObject* b = (BaseObject*)contact->GetFixtureB()->GetUserData();
 
+	if(a && b)
+	{
+		Rocket* ra = dynamic_cast<Rocket*>(a);
+		Trash* rb = dynamic_cast<Trash*>(b);
+		if(ra && rb)
+		{
+			Gameplay::gayplay->collide(ra, rb);
+		}
+		else
+		{
+			ra = dynamic_cast<Rocket*>(b);
+			rb = dynamic_cast<Trash*>(a);
+			if(ra && rb)
+			{
+				Gameplay::gayplay->collide(ra, rb);
+			}
+		}
+	}
 }
 
 void Listener::EndContact(b2Contact* contact)
