@@ -791,19 +791,6 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	drainImpulseFuel = true;
 }
 
-void Gameplay::jetpackCallback( CCNode* node, void* obj )
-{
-	
-}
-
-void Gameplay::explosionCallback( CCNode* node, void* obj )
-{
-	CCNode* kurwa = (CCNode*)obj;
-	kurwa->stopAllActions();
-	kurwa->setIsVisible(false);
-	world->removeChild(kurwa, true);
-}
-
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
 {
 	CCTouch* touch = (CCTouch*)pTouches->anyObject();
