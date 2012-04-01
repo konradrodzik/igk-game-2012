@@ -48,29 +48,37 @@ bool Gameplay::init()
 	playerPos->setAnchorPoint(ccp(0,0));
 	playerPos->setPosition(ccp(100, 100));
 
-	// Background
-	mBackground = CCSprite::spriteWithFile("space.png");
-	mBackground->setAnchorPoint(ccp(0,0));
-	mBackground->setPosition(ccp(0,0));
-	addChild(mBackground);
-
 	world = CCNode::node();
 	world->setContentSize(size);
 	world->setAnchorPoint(ccp(0.5, 0.5));
 	world->setPosition(ccp(size.width / 2, size.height / 2));
 	addChild(world);
+	
+	// Background
+	for(int x = -3; x <= 3; ++x) {
+		for(int y = -3; y <= 3; ++y) {
+			mBackground = CCSprite::spriteWithFile("space.png");
+			mBackground->setAnchorPoint(ccp(0,0));
+			mBackground->setPosition(ccp(1024*x,768*y));
+			mBackground->setFlipX((x&1) != 0);
+			mBackground->setFlipY((y&1) != 0);
+			world->addChild(mBackground);
+		}
+	}
 
 	// setup sun
 	sun = new Sun();
 	sun->setPosition(ccp(-sun->getContentSize().width / 2 + 400, world->getContentSize().height / 2));
-	world->addChild(sun, 100);
+	world->addChild(sun);
 	world->addChild(playerPos);
 
 	// setup world rotation around sun
 	float sunAnchorPositionX = (sun->getPositionX())  / world->getContentSize().width;
 	world->setAnchorPoint(ccp(sunAnchorPositionX, 0.5));
 	world->setPosition(ccp(world->getPositionX() - (0.5 + fabs(sunAnchorPositionX)) * world->getContentSize().width, world->getPositionY()));
-	
+
+	cursor = CCSprite::spriteWithFile("player.png");
+	cursor->retain();
 
 	initPhysicalWorld();
 	scheduleUpdate();
@@ -241,6 +249,7 @@ void Gameplay::updatePlanets(ccTime dt)
 
 void Gameplay::updatePhysic( ccTime dt )
 {
+	CCSize size = CCDirector::sharedDirector()->getWinSize();
 	int32 velocityIterations = 8;
 	int32 positionIterations = 1;
 
@@ -262,7 +271,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		float maxRadius = planet->maxGravityRadius;
 
 		// rotating force
-		float force = 1500;
+		float force = 1000;
 		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
 		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
 		forceVector.Normalize();
@@ -291,15 +300,37 @@ void Gameplay::updatePhysic( ccTime dt )
 		globalForce += F;
 	}
 
+	// engine force
+	CCPoint engineForceVectorCC = ccpForAngle(CC_DEGREES_TO_RADIANS(90 + mPlayer->mPlayer->getRotation()));
+	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
+	engineForceVector *= 100;
+	globalForce += engineForceVector;
+
+	// sun gravity
+	float sunRadius = 800 * PTM_RATIO;
+	b2Vec2 sunPosition = b2Vec2(sun->getPosition().x * PTM_RATIO, sun->getPosition().y * PTM_RATIO);
+	b2Vec2 sunGravityVector = sunPosition - mPlayer->mPlayerBody->GetPosition();
+	float playerSunDistance = sunGravityVector.Length() - sunRadius;
+	if(playerSunDistance > 0)
+	{
+		float maxSunDistance = size.width * PTM_RATIO + fabs(sun->getPositionX() * PTM_RATIO) - sunRadius;
+		float sunGravityFactor = playerSunDistance / maxSunDistance;
+		float sunGravityForce = 500 * sunGravityFactor;
+
+		sunGravityVector.Normalize();
+
+		sunGravityVector *= sunGravityForce;
+		globalForce += sunGravityVector;
+	}
 	// Finally apply a force on the body in the direction of the "Planet"
-	//mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
+	mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
 	mPlayer->mPlayerBody->SetAngularVelocity(0);
 	mPlayer->mPlayerBody->ApplyForce(globalForce, mPlayer->mPlayerBody->GetPosition());
 
 	mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO));
 
-	float oldRotation  = mPlayer->mPlayer->getRotation();
-	mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
+	//float oldRotation  = mPlayer->mPlayer->getRotation();
+	//mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
 }
 
 void Gameplay::update(ccTime dt) {
@@ -364,6 +395,8 @@ void Gameplay::createPlayer(float posx, float posy)
 
 	mPlayer->mPlayerBody = body;
 	mPlayer->mPlayerFixture = playerFixture;
+
+	mPlayer->direction = ccp(0, 1);
 }
 
 void Gameplay::removePlanet(int i)
@@ -389,8 +422,8 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	planet->setPos(position);
 	world->addChild(planet->getSprite());
 
-	// inside we are multiplying by PTM
-	planet->setGravityRadius(planet->getSprite()->getContentSize().width);
+	planet->gravityRadius = planet->getSprite()->getContentSize().width * PTM_RATIO;
+	planet->maxGravityRadius = 2*planet->gravityRadius;
 
 	mPlanets.push_back(planet);
 
@@ -438,18 +471,11 @@ void Gameplay::draw()
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
+void Gameplay::playerJetpack()
 {
 	if(impulseTimer > 2) 
 	{
 		impulseTimer = 0;
-		CCTouch* touch = (CCTouch*)pTouches->anyObject();
-		CCPoint p = world->convertTouchToNodeSpace(touch);
-
-		CCParticleSystem* particle = ParticleFactory::explosion();
-		particle->setPosition(p);
-		world->addChild(particle, 1);
-
 		CCPoint dir = ccpForAngle(CC_DEGREES_TO_RADIANS(90 + mPlayer->mPlayer->getRotation()));
 
 		b2Vec2 direction = b2Vec2(dir.x, dir.y);
@@ -458,14 +484,38 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	}
 }
 
+void Gameplay::playerLookAt(CCPoint p)
+{
+	CCPoint dir = ccpSub(p, mPlayer->mPlayer->getPosition());
+	mPlayer->direction = ccpNormalize(dir);
+	float angle = -CC_RADIANS_TO_DEGREES(ccpToAngle(dir)) + 90;
+	mPlayer->mPlayer->setRotation(angle);
+}
+
+void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
+{
+	CCTouch* touch = (CCTouch*)pTouches->anyObject();
+	CCPoint p = world->convertTouchToNodeSpace(touch);
+
+	cursor->setPosition(p);
+	world->addChild(cursor);
+
+	playerLookAt(cursor->getPosition());
+}
+
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
 {
+	CCTouch* touch = (CCTouch*)pTouches->anyObject();
+	CCPoint p = world->convertTouchToNodeSpace(touch);
 
+	cursor->setPosition(p);
+	playerLookAt(cursor->getPosition());
 }
 
 void Gameplay::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
-
+	playerLookAt(cursor->getPosition());
+	world->removeChild(cursor, false);
 }
 
 void Gameplay::updateScore()
