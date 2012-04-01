@@ -1,4 +1,5 @@
 #include "Gameplay.h"
+#include "Input.h"
 
 Gameplay::Gameplay() {
 	scheduleUpdate();
@@ -55,10 +56,27 @@ bool Gameplay::init()
 
 void Gameplay::update(ccTime dt) 
 {
+	Input::instance()->update();
+	if(Input::instance()->keyDown(VK_UP)) {
+		
+	}
 
+	if(Input::instance()->keyDown(VK_DOWN)) {
+
+	}
 }
 
 void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 {
 	world->setRotation(world->getRotation() + 5);
+}
+
+void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
+{
+
+}
+
+void Gameplay::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
+{
+
 }
