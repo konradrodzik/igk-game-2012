@@ -5,7 +5,7 @@
 
 using namespace cocos2d;
 
-class Player : public CCNode
+class Player : public CCSprite
 {
 public:
 	Player(void);

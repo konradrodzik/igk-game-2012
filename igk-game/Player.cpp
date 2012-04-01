@@ -3,6 +3,7 @@
 
 Player::Player(void)
 {
+	initWithFile("player.png");
 }
 
 

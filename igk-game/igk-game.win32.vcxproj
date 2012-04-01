@@ -125,6 +125,7 @@
     <None Include="Resources\CloseNormal.png" />
     <None Include="Resources\CloseSelected.png" />
     <None Include="Resources\HelloWorld.png" />
+    <None Include="Resources\player.png" />
     <None Include="Resources\sun.jpg" />
     <None Include="win32\res\igk-game.ico" />
   </ItemGroup>
@@ -133,7 +134,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Classes\AppDelegate.h" />
+    <ClInclude Include="Classes\Common.h" />
     <ClInclude Include="Classes\Gameplay.h" />
+    <ClInclude Include="Classes\Input.h" />
     <ClInclude Include="Classes\WelcomeScene.h" />
     <ClInclude Include="Classes\MenuScene.h" />
     <ClInclude Include="GLES-Render.h" />
@@ -146,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="Classes\AppDelegate.cpp" />
     <ClCompile Include="Classes\Gameplay.cpp" />
+    <ClCompile Include="Classes\Input.cpp" />
     <ClCompile Include="Classes\WelcomeScene.cpp" />
     <ClCompile Include="Classes\MenuScene.cpp" />
     <ClCompile Include="GLES-Render.cpp" />

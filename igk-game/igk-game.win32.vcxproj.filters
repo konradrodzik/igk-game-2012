@@ -24,6 +24,9 @@
     <Filter Include="Classes\Utils">
       <UniqueIdentifier>{dc935072-cb70-4e15-96a9-06ad4de6c044}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Classes\KeyboardHandling">
+      <UniqueIdentifier>{ab650261-694c-4869-b585-95efcaa2b281}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\res\igk-game.ico">
@@ -39,6 +42,9 @@
       <Filter>resource</Filter>
     </None>
     <None Include="Resources\sun.jpg">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\player.png">
       <Filter>resource</Filter>
     </None>
   </ItemGroup>
@@ -78,6 +84,12 @@
     <ClInclude Include="GLES-Render.h">
       <Filter>Classes\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Classes\Common.h">
+      <Filter>Classes\KeyboardHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Input.h">
+      <Filter>Classes\KeyboardHandling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Classes\MenuScene.cpp">
@@ -103,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="Planet.cpp">
       <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Input.cpp">
+      <Filter>Classes\KeyboardHandling</Filter>
     </ClCompile>
     <ClCompile Include="GLES-Render.cpp">
       <Filter>Classes\Utils</Filter>
