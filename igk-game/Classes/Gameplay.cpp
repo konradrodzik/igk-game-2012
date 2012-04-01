@@ -125,8 +125,8 @@ bool Gameplay::hasPlanetsNear(const CCPoint &pos, float radius)
 	{
 		Planet* planet = mPlanets[i];
 		b2Vec2 planetCenter = planet->mPlanetBody->GetPosition();
-		planetCenter.x *= PTM_RATIO;
-		planetCenter.y *= PTM_RATIO;
+		planetCenter.x /= PTM_RATIO;
+		planetCenter.y /= PTM_RATIO;
 		float distance = (planetCenter - posCenter).Length();
 		if(distance < radius)
 			return true;
@@ -140,7 +140,7 @@ void Gameplay::updatePlanets(ccTime dt)
 	{
 		Planet* planet = mPlanets[i];
 		b2Vec2 planetCenter = planet->mPlanetBody->GetPosition();
-		CCPoint planetScreen(planetCenter.x * PTM_RATIO, planetCenter.y * PTM_RATIO);
+		CCPoint planetScreen(planetCenter.x / PTM_RATIO, planetCenter.y / PTM_RATIO);
 
 		float dist = 1.0f;
 		b2Vec2 normalized;
@@ -204,8 +204,8 @@ void Gameplay::updatePlanets(ccTime dt)
 		const float AngleDiff = 2.0f * M_PI / 30.0f;
 		const float AngularMin = 60.0f / 180.0f * M_PI;
 		const float AngularMax = 180.0f / 180.0f * M_PI;
-		const float VelocityMin = 1 / PTM_RATIO;
-		const float VelocityMax = 3 / PTM_RATIO;
+		const float VelocityMin = 1 * PTM_RATIO;
+		const float VelocityMax = 3 * PTM_RATIO;
 		
 		angle = 2 * M_PI * (float)rand() / RAND_MAX;
 		float vel = VelocityMin + (float)rand() / RAND_MAX * (VelocityMax - VelocityMin);
@@ -333,7 +333,8 @@ void Gameplay::createPlayer(float posx, float posy)
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &dynamicBox;	
 	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.3f;
+	fixtureDef.friction = 0.0f;
+	fixtureDef.restitution = 0.5f;
 	b2Fixture* playerFixture = body->CreateFixture(&fixtureDef);
 
 	mPlayer->mPlayerBody = body;
@@ -374,7 +375,6 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	planetBodyDef.type = b2_dynamicBody;
 	planetBodyDef.position.Set(position.x*PTM_RATIO, position.y*PTM_RATIO);
 	planetBodyDef.userData = planet;
-	planetBodyDef.position.Set(position.x/PTM_RATIO, position.y/PTM_RATIO);
 	b2Body* planetBody = mWorld->CreateBody(&planetBodyDef);
 
 	b2CircleShape shape;

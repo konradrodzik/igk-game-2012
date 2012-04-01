@@ -14,11 +14,10 @@ public:
 
 	void setPos(CCPoint pos);
 	void setAngle(float angle);
-private:
+
 	CCSprite* planetSprite;
 	float gravityRadius;
 	float maxGravityRadius;
-public:
 	// Physical representation
 	b2Body* mPlanetBody;
 	b2Fixture* mPlanetFixture;
