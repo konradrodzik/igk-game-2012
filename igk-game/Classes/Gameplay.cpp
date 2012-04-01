@@ -131,6 +131,23 @@ bool Gameplay::init()
 	scoreText->setPosition(ccp(50,hud->getContentSize().height/2.0f));
 	hud->addChild(scoreText);
 
+
+	// Init explosion anim
+	CCSprite* mExplosionAnimTexture;
+	CCAnimation* mExplosionpakAnimation;
+	mExplosionAnimTexture = new CCSprite;
+	mExplosionAnimTexture->initWithFile("jetpack.png");
+	mExplosionpakAnimation = new CCAnimation();
+	mExplosionpakAnimation->initWithFrames(NULL, 0.03f);
+	for(int y = 0; y < 7; ++y) {
+		for(int x = 0; x < 8; ++x) {
+			float width = 256;
+			float height = 256.0f;
+			CCSpriteFrame* frame = CCSpriteFrame::frameWithTexture(mExplosionAnimTexture->getTexture(), CCRect(x*width, y*height, width, height));
+			mExplosionpakAnimation->addFrame(frame);
+		}
+	}
+
 	return true;
 }
 
@@ -434,13 +451,11 @@ void Gameplay::createPlayer(float posx, float posy)
 	world->addChild(mPlayer->mPlayer, 3);
 
 	// Jetpack animation
-	CCSprite* mJetpakAnimTexture = new CCSprite();
-	mJetpakAnimTexture->initWithFile("explosion.png");
-	CCAnimation* mJetpakAnimation = new CCAnimation();
-	//mTeslaCoilAnimation->initWithName("tesla_coil", WEAPON_ANIM_SPEED);
-	mJetpakAnimation->initWithFrames(NULL, 0.3f);
+	mJetpakAnimTexture = CCSprite::spriteWithFile("jetpack.png");
+	mJetpakAnimation = new CCAnimation();
+	mJetpakAnimation->initWithFrames(NULL, 0.03f);
 	for(int y = 0; y < 4; ++y) {
-		for(int x = 0; x < 10; ++x) {
+		for(int x = 0; x < 8; ++x) {
 			float width = 256;
 			float height = 256.0f;
 			CCSpriteFrame* frame = CCSpriteFrame::frameWithTexture(mJetpakAnimTexture->getTexture(), CCRect(x*width, y*height, width, height));
@@ -450,11 +465,10 @@ void Gameplay::createPlayer(float posx, float posy)
 
 	mJetpakAnimTexture->setAnchorPoint(ccp(0.5f, 0.5f));
 	mJetpakAnimTexture->setPosition(ccp(14, 36));
-	mPlayer->mPlayer->addChild(mJetpakAnimTexture);
+	world->addChild(mJetpakAnimTexture, 2);
+	mJetpakAnimTexture->setIsVisible(false);
 
-	CCActionInterval* jetpackAction = CCAnimate::actionWithAnimation(mJetpakAnimation);
-	CCRepeatForever* repeat = CCRepeatForever::actionWithAction(jetpackAction);
-	mJetpakAnimTexture->runAction(repeat);
+	
 
 
 	// PHYSICAL REPRESENTATION
@@ -587,8 +601,22 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	cursor->setPosition(p);
 	world->addChild(cursor);
 
+	CCActionInterval* jetpackAction = CCAnimate::actionWithAnimation(mJetpakAnimation);
+	CCCallFuncND* callfunc = CCCallFuncND::actionWithTarget(this, callfuncND_selector(Gameplay::jetpackCallback), NULL);
+	CCSequence* seq = CCSequence::actionOneTwo(jetpackAction, callfunc);
+	mJetpakAnimTexture->stopAllActions();
+	mJetpakAnimTexture->setIsVisible(true);
+	mJetpakAnimTexture->runAction(seq);
+
+
 	playerLookAt(cursor->getPosition());
 	drainImpulseFuel = true;
+}
+
+void Gameplay::jetpackCallback( CCNode* node, void* obj )
+{
+	mJetpakAnimTexture->stopAllActions();
+	mJetpakAnimTexture->setIsVisible(false);
 }
 
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
