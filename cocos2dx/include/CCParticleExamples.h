@@ -142,7 +142,7 @@ class CC_DLL CCParticleMeteor : public ARCH_OPTIMAL_PARTICLE_SYSTEM
 public:
 	CCParticleMeteor(){}
 	virtual ~CCParticleMeteor(){}
-	bool init(){ return initWithTotalParticles(150); }
+	bool init(){ return initWithTotalParticles(50); }
 	virtual bool initWithTotalParticles(unsigned int numberOfParticles);
 	static CCParticleMeteor * node()
 	{

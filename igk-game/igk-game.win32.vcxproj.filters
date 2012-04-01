@@ -47,6 +47,96 @@
     <None Include="Resources\player.png">
       <Filter>resource</Filter>
     </None>
+    <None Include="Resources\astro.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\BoilingFoam.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\BurstPipe.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Comet.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Comet.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\ExplodingRing.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\fire.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\fire-grayscale.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Flower.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Fog.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Galaxy.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\LavaFlow.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\moon.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\particles.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\particles-hd.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Phoenix.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\planet_01.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\planet_02.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\planet_03.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\snow.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\space.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Spiral.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\stars.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\stars2.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\stars2-grayscale.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\stars-grayscale.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\streak.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\sun.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\sun_static.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Upsidedown.plist">
+      <Filter>resource</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="win32\igk-game.rc">
@@ -90,6 +180,9 @@
     <ClInclude Include="Classes\Input.h">
       <Filter>Classes\KeyboardHandling</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleFactory.h">
+      <Filter>Classes\Gameplay</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Classes\MenuScene.cpp">
@@ -121,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="GLES-Render.cpp">
       <Filter>Classes\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleFactory.cpp">
+      <Filter>Classes\Gameplay</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

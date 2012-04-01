@@ -218,4 +218,13 @@ void Gameplay::draw()
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
+void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
+{
+	CCTouch* touch = (CCTouch*)pTouches->anyObject();
+	CCPoint p = CCDirector::sharedDirector()->convertToGL(touch->locationInView(touch->view()));
+
+	CCParticleSystem* particle = ParticleFactory::explosion();
+	particle->setPosition(p);
+	world->addChild(particle, 1);
+}
 

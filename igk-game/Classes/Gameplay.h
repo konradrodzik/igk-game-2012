@@ -6,10 +6,9 @@
 #include "Sun.h"
 #include "Planet.h"
 #include "Player.h"
+#include "ParticleFactory.h"
 
 #include "Box2D/Box2D.h"
-
-
 
 using namespace cocos2d;
 
@@ -37,6 +36,8 @@ public:
 	void clearLevel();
 
 	void draw();
+
+	virtual void ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent);
 
 private:
 	CCSprite* mBackground;
