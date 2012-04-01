@@ -1,7 +1,7 @@
 #include "Gameplay.h"
 #include "Input.h"
 
-#define PTM_RATIO 32
+#define PTM_RATIO (1.0f/32.0f)
 
 Gameplay::Gameplay() {
 }
@@ -97,6 +97,7 @@ void Gameplay::updatePhysic( ccTime dt )
 
 	mWorld->Step(dt, velocityIterations, positionIterations);
 
+	b2Vec2 globalForce = b2Vec2_zero;
 	for(int i = 0; i < mPlanets.size(); ++i) {
 		Planet* planet = mPlanets[i];
 
@@ -107,40 +108,47 @@ void Gameplay::updatePhysic( ccTime dt )
 		b2Vec2 distance = planetCenter - mPlayer->mPlayerBody->GetPosition();
 		float distanceLength = sqrt(distance.x*distance.x+distance.y*distance.y);
 
-		float maxRadius = planet->getSprite()->getContentSize().width * PTM_RATIO;
-		float smallRadius = planet->getSprite()->getContentSize().width/2 * 1.6;
-		
-		float force = 500;// / distance.LengthSquared(); // 150 can be changed to adjust the amount of force
+		float maxRadius = planet->maxGravityRadius;
+
+		// rotating force
+		float force = 1500;
 		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
-
-
-		b2Vec2 gravityVec;
-		float gravityForce = 9.8;
-		float gravityStrength = clampf(1-(distanceLength)/maxRadius, 0, 1) * gravityForce;;
-		if(distanceLength > smallRadius) {
-			  gravityVec = b2Vec2(-distance.x, -distance.y);
-		} else {
-			 gravityVec = b2Vec2(distance.x, distance.y);
-		}
-		gravityVec.Normalize();
-		gravityVec *= gravityForce;
-
 		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
 		forceVector.Normalize();
 		b2Vec2 F = force * forceVector;
+
+		// gravity
+		float bla;
+		float bla2;
+		float gravityForce = 98;
+		b2Vec2 gravityVec;
+		b2Vec2 normalizedDistance = distance;
+		normalizedDistance.Normalize();
+		if(distanceLength < planet->gravityRadius) {
+			bla = distanceLength / planet->gravityRadius; 
+			gravityVec = b2Vec2(bla*gravityForce*-normalizedDistance.x, bla*gravityForce*-normalizedDistance.y);
+		} else if(distanceLength < planet->maxGravityRadius) {
+			bla = (distanceLength - planet->gravityRadius) / (planet->maxGravityRadius - planet->gravityRadius);
+			bla2 = -pow(2*bla-1, 2) + 1;
+			gravityVec = b2Vec2(bla2*gravityForce*normalizedDistance.x, bla2*gravityForce*normalizedDistance.y);
+		} else {
+			gravityVec = b2Vec2_zero;
+		}
+
 		F += gravityVec;
-		// Finally apply a force on the body in the direction of the "Planet"
-		mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
-		mPlayer->mPlayerBody->SetAngularVelocity(0);
-		mPlayer->mPlayerBody->ApplyForce(F, mPlayer->mPlayerBody->GetPosition()/*+b2Vec2(0,5*PTM_RATIO)*/);
 
-
-
-		mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x * PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y * PTM_RATIO));
-		
-		float oldRotation  = mPlayer->mPlayer->getRotation();
-		mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
+		globalForce += F;
 	}
+
+	// Finally apply a force on the body in the direction of the "Planet"
+	mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
+	mPlayer->mPlayerBody->SetAngularVelocity(0);
+	mPlayer->mPlayerBody->ApplyForce(globalForce, mPlayer->mPlayerBody->GetPosition()/*+b2Vec2(0,5*PTM_RATIO)*/);
+
+	mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO));
+
+	float oldRotation  = mPlayer->mPlayer->getRotation();
+	mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
 }
 
 void Gameplay::update(ccTime dt) {
@@ -172,7 +180,7 @@ void Gameplay::createPlayer(float posx, float posy)
 	// PHYSICAL REPRESENTATION
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(position.x/PTM_RATIO, position.y/PTM_RATIO);
+	bodyDef.position.Set(position.x*PTM_RATIO, position.y*PTM_RATIO);
 	bodyDef.userData = mPlayer;
 	b2Body *body = mWorld->CreateBody(&bodyDef);
 
@@ -192,23 +200,26 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer->mPlayerFixture = playerFixture;
 }
 
-void Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
+void Gameplay::addPlanet( std::string planetSpriteName, CCPoint position)
 {
 	Planet* planet = new Planet(planetSpriteName);
 	planet->setPos(position);
 	world->addChild(planet->getSprite());
+
+	planet->gravityRadius = planet->getSprite()->getContentSize().width * PTM_RATIO;
+	planet->maxGravityRadius = 2*planet->gravityRadius;
 
 	mPlanets.push_back(planet);
 
 	// Physical representation
 
 	b2BodyDef planetBodyDef;
-	planetBodyDef.position.Set(position.x/PTM_RATIO, position.y/PTM_RATIO);
+	planetBodyDef.position.Set(position.x*PTM_RATIO, position.y*PTM_RATIO);
 	planetBodyDef.userData = planet;
 	b2Body* planetBody = mWorld->CreateBody(&planetBodyDef);
 
 	b2CircleShape shape;
-	shape.m_radius = planet->getSprite()->getContentSize().width / 2 / PTM_RATIO;
+	shape.m_radius = planet->getSprite()->getContentSize().width / 2 * PTM_RATIO;
 	//shape.m_p.Set(8.0f, 8.0f);
 	b2FixtureDef fd;
 	fd.shape = &shape;
