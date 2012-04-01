@@ -35,6 +35,10 @@ bool Gameplay::init()
 	setIsTouchEnabled(true);
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
+	player = new Player();
+	player->setPosition(ccp(size.width / 2, size.height / 2));
+	this->addChild(player, 1);
+
 	world = CCNode::node();
 	world->setContentSize(size);
 	world->setAnchorPoint(ccp(0.5, 0.5));
@@ -58,17 +62,17 @@ void Gameplay::update(ccTime dt)
 {
 	Input::instance()->update();
 	if(Input::instance()->keyDown(VK_UP)) {
-		
+		world->setRotation(world->getRotation() + 1);
 	}
 
 	if(Input::instance()->keyDown(VK_DOWN)) {
-
+		world->setRotation(world->getRotation() - 1);
 	}
 }
 
 void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 {
-	world->setRotation(world->getRotation() + 5);
+	//world->setRotation(world->getRotation() + 5);
 }
 
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)

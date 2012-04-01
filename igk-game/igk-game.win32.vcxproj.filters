@@ -41,6 +41,9 @@
     <None Include="Resources\sun.jpg">
       <Filter>resource</Filter>
     </None>
+    <None Include="Resources\player.png">
+      <Filter>resource</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="win32\igk-game.rc">
