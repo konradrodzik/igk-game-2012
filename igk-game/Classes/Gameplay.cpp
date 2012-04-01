@@ -89,19 +89,34 @@ bool Gameplay::init()
 	hud->setAnchorPoint(ccp(0.0f, 0.0f));
 	hud->setPosition(ccp(0,0));
 	addChild(hud);
-
+	
 	for(int i = 0; i < 3; ++i) {
 		CCSprite* life = CCSprite::spriteWithFile("life.png");
 		mLifeSprites.push_back(life);
 		life->setPosition(ccp(hud->getContentSize().width-3*(10+life->getContentSize().width) + i*(10+life->getContentSize().width), hud->getContentSize().height/2.0f));
 		hud->addChild(life);
 	}
+
+
+	//CCParticleSystem *particleSystem = ParticleFactory::stars();
+	//particleSystem->setPosition(screenSize.width / 2, screenSize.height / 2);
+	//world->addChild(particleSystem, 1);
+	trail = ParticleFactory::meteor(); 
+	trail->setPositionType(kCCPositionTypeRelative);
+	trail->setPosition(mPlayer->mPlayer->getPosition());
+	world->addChild(trail, 1);
+
 	
 
 	grid = CCSprite::spriteWithFile("siatka.png");
 	grid->setAnchorPoint(ccp(0,1));
 	grid->setPosition(ccp(296, size.height-664));
 	addChild(grid);
+
+	timeLabel = CCLabelTTF::labelWithString("Time: 0", "Verdana",30);
+	timeLabel->setAnchorPoint(ccp(0.5f, 0.5f));
+	timeLabel->setPosition(ccp(grid->getContentSize().width * 0.5f,grid->getContentSize().height * 0.5f));
+	grid->addChild(timeLabel);
 
 	scoreText = CCLabelTTF::labelWithString("Score: 0", "Verdana",30);
 	scoreText->setAnchorPoint(ccp(0.0f, 0.5f));
@@ -111,8 +126,10 @@ bool Gameplay::init()
 	return true;
 }
 
+
 void Gameplay::initPhysicalWorld()
 {
+	totalTime = 0;
 	// Create Box2d world
 	b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
 	bool doSleep = false;
@@ -184,10 +201,10 @@ void Gameplay::updatePlanets(ccTime dt)
 
 		// dist *= 1.0f - exp(- dist / dt);
 
-		dist *= 0.3f;
-		dist += 0.7f;
+		dist *= 3.0f;
+		dist += 0.8f;
 
-		float force = 0.2f / (dist * dist);
+		float force = 5000.0f / (dist);
 
 		normalized.x *= force;
 		normalized.y *= force;
@@ -230,8 +247,8 @@ void Gameplay::updatePlanets(ccTime dt)
 		Planet* planetObj = addPlanet(images[rand() % MaxImages], planet);
 		
 		const float AngleDiff = 2.0f * M_PI / 30.0f;
-		const float AngularMin = 60.0f / 180.0f * M_PI;
-		const float AngularMax = 180.0f / 180.0f * M_PI;
+		const float AngularMin = 20.0f / 180.0f * M_PI;
+		const float AngularMax = 60.0f / 180.0f * M_PI;
 		const float VelocityMin = 0.25 * PTM_RATIO;
 		const float VelocityMax = 1.0f * PTM_RATIO;
 
@@ -247,6 +264,8 @@ void Gameplay::updatePlanets(ccTime dt)
 
 void Gameplay::updatePhysic( ccTime dt )
 {
+	totalTime += dt;
+
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 	int32 velocityIterations = 8;
 	int32 positionIterations = 1;
@@ -325,7 +344,14 @@ void Gameplay::updatePhysic( ccTime dt )
 	mPlayer->mPlayerBody->SetAngularVelocity(0);
 	mPlayer->mPlayerBody->ApplyForce(globalForce, mPlayer->mPlayerBody->GetPosition());
 
-	mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO));
+	CCPoint pos(mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO);
+	float t1 = 1.0f - exp(- dt / 0.5f);
+	float t2 = 1.0f - exp(- dt / 0.25f);
+
+	mPlayer->mOptimizedPos = ccpLerp(mPlayer->mOptimizedPos, pos, t1);
+	mPlayer->mOptimizedPos2 = ccpLerp(mPlayer->mOptimizedPos2, pos, t2);
+
+	mPlayer->mPlayer->setPosition(mPlayer->mOptimizedPos2);
 
 	//float oldRotation  = mPlayer->mPlayer->getRotation();
 	//mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
@@ -333,7 +359,7 @@ void Gameplay::updatePhysic( ccTime dt )
 
 void Gameplay::update(ccTime dt) {
 	impulseTimer += dt;
-
+	updateScore();
 	Input::instance()->update();
 
 	if(Input::instance()->keyDown(VK_UP)) {
@@ -352,7 +378,7 @@ void Gameplay::update(ccTime dt) {
 		mPlayer->mPlayer->setPositionX(mPlayer->mPlayer->getPositionX() + 100 * dt);
 	}
 
-	CCPoint sub = ccpSub(mPlayer->mPlayer->getPosition(), sun->getPosition());
+	CCPoint sub = ccpSub(mPlayer->mOptimizedPos, sun->getPosition());
 	float angle =  CC_RADIANS_TO_DEGREES(ccpToAngle(sub));
 	world->setRotation(angle);
 
@@ -361,6 +387,8 @@ void Gameplay::update(ccTime dt) {
 	playerPos->setString(buf);
 
 	updatePhysic(dt);
+
+ 	trail->setPosition(mPlayer->mPlayer->getPosition());
 }
 
 void Gameplay::createPlayer(float posx, float posy)
@@ -370,7 +398,7 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer = new Player;
 	mPlayer->mPlayer = CCSprite::spriteWithFile("astro.png");
 	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
-	world->addChild(mPlayer->mPlayer);
+	world->addChild(mPlayer->mPlayer, 3);
 
 	// Jetpack animation
 	CCSprite* mJetpakAnimTexture = new CCSprite();
@@ -463,6 +491,7 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	//shape.m_p.Set(8.0f, 8.0f);
 	b2FixtureDef fd;
 	fd.shape = &shape;
+	fd.density = 1000.0f;
 	fd.restitution = 1.0f;
 	fd.friction = 0.0f;
 	b2Fixture* planetFixture = planetBody->CreateFixture(&fd);
@@ -482,6 +511,7 @@ void Gameplay::clearLevel()
 
 void Gameplay::draw()
 {
+#if 0
 	glDisable(GL_TEXTURE_2D);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -492,6 +522,7 @@ void Gameplay::draw()
 	glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+#endif
 }
 
 void Gameplay::playerJetpack()
@@ -546,4 +577,41 @@ void Gameplay::updateScore()
 	char tab[255] = {0};
 	sprintf(tab, "Score: %i", mPlayer->score);
 	scoreText->setString(tab);
+	sprintf(tab, "Time: %.2f", totalTime);
+	timeLabel->setString(tab);
+
+	static int lastScored = 0;
+	int currentScore = (int)totalTime;
+	if (currentScore % 10 == 0 && lastScored != currentScore) {
+		lastScored = currentScore;
+		sprintf(tab, "You survived %.0f seconds, Great!", totalTime);
+		this->showAchievement(tab);
+	}
+}
+
+
+void Gameplay::removeAchievement(CCNode *label) 
+{
+	label->removeFromParentAndCleanup(true);
+}
+
+void Gameplay::showAchievement(const char *achievementName)
+{
+	CCSize size = CCDirector::sharedDirector()->getWinSize();
+	CCLabelTTF *label = CCLabelTTF::labelWithString(achievementName, "Comic Sans", 48);
+	label->setPosition(ccp(size.width * 0.5f, size.height * 0.5f));
+	label->setColor(ccc3(128,255, 0));
+	this->addChild(label, 4);
+
+	CCFadeIn *fadeIn = CCFadeIn::actionWithDuration(0.2f);
+	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(0.4f, 4, 4);
+	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(0.4f, rand() % 60 - 30);
+	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(0.4f);
+	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
+	CCDelayTime *delayTime = CCDelayTime::actionWithDuration(0.2f);
+
+	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, NULL);
+	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
+	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
+	label->runAction(sequence);
 }
