@@ -90,6 +90,14 @@ bool Gameplay::init()
 	hud->setAnchorPoint(ccp(0.0f, 0.0f));
 	hud->setPosition(ccp(0,0));
 	addChild(hud);
+	
+	for(int i = 0; i < 3; ++i) {
+		CCSprite* life = CCSprite::spriteWithFile("life.png");
+		mLifeSprites.push_back(life);
+		life->setPosition(ccp(hud->getContentSize().width-3*(10+life->getContentSize().width) + i*(10+life->getContentSize().width), hud->getContentSize().height/2.0f));
+		hud->addChild(life);
+	}
+
 
 	//CCParticleSystem *particleSystem = ParticleFactory::stars();
 	//particleSystem->setPosition(screenSize.width / 2, screenSize.height / 2);
@@ -98,19 +106,12 @@ bool Gameplay::init()
 	trail->setPositionType(kCCPositionTypeRelative);
 	trail->setPosition(mPlayer->mPlayer->getPosition());
 	world->addChild(trail, 1);
-	/*for(int i = 0; i < 3; ++i) {
-		mLifeSprites[0] = CCSprite::spriteWithFile("life.png");
-	}
+
 	
-	mLifeSprites[1] = CCSprite::spriteWithFile("life.png");
-	mLifeSprites[2] = CCSprite::spriteWithFile("life.png");
-	hud->addChild(mLifeSprites[0]);
-	hud->addChild(mLifeSprites[0]);
-	hud->addChild(mLifeSprites[0]);*/
 
 	grid = CCSprite::spriteWithFile("siatka.png");
 	grid->setAnchorPoint(ccp(0,1));
-	grid->setPosition(ccp(296, 664));
+	grid->setPosition(ccp(296, size.height-664));
 	addChild(grid);
 
 	impulseFuelIndicator = CCLayerColor::layerWithColor(ccc4(1, 255, 1, 128));
@@ -431,6 +432,30 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer->mPlayer = CCSprite::spriteWithFile("astro.png");
 	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
 	world->addChild(mPlayer->mPlayer, 3);
+
+	// Jetpack animation
+	CCSprite* mJetpakAnimTexture = new CCSprite();
+	mJetpakAnimTexture->initWithFile("explosion.png");
+	CCAnimation* mJetpakAnimation = new CCAnimation();
+	//mTeslaCoilAnimation->initWithName("tesla_coil", WEAPON_ANIM_SPEED);
+	mJetpakAnimation->initWithFrames(NULL, 0.3f);
+	for(int y = 0; y < 4; ++y) {
+		for(int x = 0; x < 10; ++x) {
+			float width = 256;
+			float height = 256.0f;
+			CCSpriteFrame* frame = CCSpriteFrame::frameWithTexture(mJetpakAnimTexture->getTexture(), CCRect(x*width, y*height, width, height));
+			mJetpakAnimation->addFrame(frame);
+		}
+	}
+
+	mJetpakAnimTexture->setAnchorPoint(ccp(0.5f, 0.5f));
+	mJetpakAnimTexture->setPosition(ccp(14, 36));
+	mPlayer->mPlayer->addChild(mJetpakAnimTexture);
+
+	CCActionInterval* jetpackAction = CCAnimate::actionWithAnimation(mJetpakAnimation);
+	CCRepeatForever* repeat = CCRepeatForever::actionWithAction(jetpackAction);
+	mJetpakAnimTexture->runAction(repeat);
+
 
 	// PHYSICAL REPRESENTATION
 	b2BodyDef bodyDef;
