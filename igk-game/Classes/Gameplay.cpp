@@ -42,15 +42,15 @@ bool Gameplay::init()
 	mBackground->setPosition(ccp(0,0));
 	//addChild(mBackground);
 
-	player = new Player();
-	player->setPosition(ccp(size.width / 2, size.height / 2));
-	this->addChild(player, 1);
-
 	world = CCNode::node();
 	world->setContentSize(size);
 	world->setAnchorPoint(ccp(0.5, 0.5));
 	world->setPosition(ccp(size.width / 2, size.height / 2));
 	addChild(world);
+
+	player = new Player();
+	player->setPosition(ccp(size.width / 2, size.height / 2));
+	world->addChild(player, 1);
 
 	// setup sun
 	sun = new Sun();
@@ -130,12 +130,16 @@ void Gameplay::updatePhysic( ccTime dt )
 void Gameplay::update(ccTime dt) {
 Input::instance()->update();
 	if(Input::instance()->keyDown(VK_UP)) {
-		world->setRotation(world->getRotation() + 1);
+		player->setPositionY(player->getPositionY() + 3);
 	}
 
 	if(Input::instance()->keyDown(VK_DOWN)) {
-		world->setRotation(world->getRotation() - 1);
+		player->setPositionY(player->getPositionY() - 3);
 	}
+
+	CCPoint sub = ccpSub(player->getPosition(), sun->getPosition());
+	float angle =  CC_RADIANS_TO_DEGREES(ccpToAngle(sub));
+	world->setRotation(angle);
 
 	updatePhysic(dt);
 }
@@ -172,7 +176,7 @@ void Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 {
 	Planet* planet = new Planet(planetSpriteName);
 	planet->setPos(position);
-	addChild(planet->getSprite());
+	world->addChild(planet->getSprite());
 
 	mPlanets.push_back(planet);
 
