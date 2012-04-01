@@ -31,6 +31,7 @@ public:
 
 	void update(ccTime dt);
 
+
 	void updatePlanets(ccTime dt);
 	void removePlanet(int i);
 	bool outsideView(const CCPoint &pos, float* distance = NULL, b2Vec2* normalized = NULL);
@@ -50,6 +51,9 @@ public:
 
 	void updateScore();
 
+	void removeAchievement(CCNode *label);
+	void showAchievement(const char*);
+
 private:
 	CCSprite* mBackground;
 	b2World* mWorld;
@@ -67,6 +71,7 @@ private:
 	CCSprite* grid;
 	CCLabelTTF* scoreText;
 	std::vector<CCSprite*> mLifeSprites;
+	CCParticleSystem *trail;
 };
 
 #endif

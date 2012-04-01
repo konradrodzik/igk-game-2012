@@ -8,8 +8,9 @@ class ParticleFactory
 {
 public:
 	static CCParticleSystemQuad* explosion();
-	static CCParticleMeteor* meteor();
+	static CCParticleSystem* meteor();
 	static CCParticleGalaxy* galaxy();
 	static CCParticleSun* sun();
+	static CCParticleSystem * stars();
 };
 
