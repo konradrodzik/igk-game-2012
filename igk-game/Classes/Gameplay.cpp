@@ -1,6 +1,6 @@
 #include "Gameplay.h"
 #include "Input.h"
-
+#include "SimpleAudioEngine.h"
 #define PTM_RATIO (1.0f/32.0f)
 
 const int MaxPlanets = 64;
@@ -42,6 +42,7 @@ CCScene* Gameplay::scene()
 
 bool Gameplay::init() 
 {
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->preloadEffect("explosion.mp3");
 	setIsTouchEnabled(true);
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
@@ -83,7 +84,7 @@ bool Gameplay::init()
 	cursor = CCSprite::spriteWithFile("player.png");
 	cursor->retain();
 	
-	for(int i = 0; i < 10; ++i)
+	for(int i = 0; i < 3; ++i)
 	{
 		CCParticleSystemQuad* galaxy = new CCParticleGalaxy();
 		galaxy->initWithFile("ExplodingRing.plist");
@@ -92,8 +93,8 @@ bool Gameplay::init()
 		galaxy->setStartRadius(BoundsDistance - 1 + (i & 3) * 5);
 		galaxy->setEndRadius(BoundsDistance + 1 + (i & 3) * 5);
 		galaxy->setDuration(100000.0f);
-		galaxy->setStartSize(25);
-		galaxy->setEndSize(40);
+		galaxy->setStartSize(35);
+		galaxy->setEndSize(50);
 		world->addChild(galaxy);
 	}
 	
@@ -350,6 +351,8 @@ void Gameplay::updatePlanets(ccTime dt)
 			world->addChild(quad);
 
 			removePlanet(i);
+			
+			CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("explosion.mp3");
 			continue;
 		}
 
