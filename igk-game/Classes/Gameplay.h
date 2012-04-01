@@ -12,6 +12,16 @@
 
 using namespace cocos2d;
 
+class Listener : public b2ContactListener
+{
+	/// Called when two fixtures begin to touch.
+	virtual void BeginContact(b2Contact* contact);
+
+	/// Called when two fixtures cease to touch.
+	virtual void EndContact(b2Contact* contact);
+
+};
+
 class Gameplay : public cocos2d::CCLayer {
 public:
 	Gameplay();
@@ -33,6 +43,7 @@ public:
 
 
 	void updatePlanets(ccTime dt);
+	void updateTrash(ccTime dt);
 	void removePlanet(int i);
 	bool outsideView(const CCPoint &pos, float* distance = NULL, b2Vec2* normalized = NULL);
 	bool hasPlanetsNear(const CCPoint &pos, float radius);
@@ -60,11 +71,12 @@ private:
 	CCSprite* mBackground;
 	b2World* mWorld;
 	std::vector<Planet*> mPlanets;
+	std::vector<Trash*> mTrashes;
 	Player* mPlayer;
 	CCNode* world;
 	Sun* sun;
 	CCLabelTTF* playerPos;
-
+	Listener *listener;
 	CCSprite* cursor;
 
 	float impulseTimer;

@@ -3,14 +3,17 @@
 
 #define PTM_RATIO (1.0f/32.0f)
 
-const int MaxPlanets = 64;
-const float MinPlanetDistance = 600;
+const int MaxPlanets = 40;
+const int MaxTrashes = 32;
+const float MinPlanetDistance = 903;
 const float MinShowPlanetDistance = 1500;
 const float MaxPlanetDistance = 2000;
 const float PlanetsDistance = 200;
+const float BoundsDistance = 1640.0f;
 
 Gameplay::Gameplay() {
 	impulseFuel = 100;
+	drainImpulseFuel = false;
 }
 
 Gameplay::~Gameplay() {
@@ -80,6 +83,35 @@ bool Gameplay::init()
 
 	cursor = CCSprite::spriteWithFile("player.png");
 	cursor->retain();
+	
+	for(int i = 0; i < 10; ++i)
+	{
+		CCParticleSystemQuad* galaxy = new CCParticleGalaxy();
+		galaxy->initWithFile("ExplodingRing.plist");
+		galaxy->setEmitterMode(1);
+		galaxy->setPosition(sun->getPosition());
+		galaxy->setStartRadius(BoundsDistance - 1 + (i & 3) * 5);
+		galaxy->setEndRadius(BoundsDistance + 1 + (i & 3) * 5);
+		galaxy->setDuration(100000.0f);
+		galaxy->setStartSize(25);
+		galaxy->setEndSize(40);
+		world->addChild(galaxy);
+	}
+	
+	for(int i = 0; i < 3; ++i)
+	{
+		CCParticleSystemQuad* galaxy = new CCParticleGalaxy();
+		galaxy = new CCParticleGalaxy();
+		galaxy->initWithFile("ExplodingRing.plist");
+		galaxy->setEmitterMode(1);
+		galaxy->setPosition(sun->getPosition());
+		galaxy->setStartRadius(MinPlanetDistance - 1 + i * 5);
+		galaxy->setEndRadius(MinPlanetDistance + 1 + i * 5);
+		galaxy->setDuration(100000.0f);
+		galaxy->setStartSize(30);
+		galaxy->setEndSize(60);
+		world->addChild(galaxy);
+	}
 
 	initPhysicalWorld();
 	scheduleUpdate();
@@ -105,6 +137,7 @@ bool Gameplay::init()
 	trail = ParticleFactory::meteor(); 
 	trail->setPositionType(kCCPositionTypeRelative);
 	trail->setPosition(mPlayer->mPlayer->getPosition());
+	trail->setDuration(20.0f);
 	world->addChild(trail, 1);
 
 	
@@ -160,7 +193,8 @@ void Gameplay::initPhysicalWorld()
 	bool doSleep = false;
 	mWorld = new b2World(gravity);
 	mWorld->SetContinuousPhysics(true);
-
+	listener = new Listener();
+	mWorld->SetContactListener(listener);
 	// Debug Draw functions
 	GLESDebugDraw* m_debugDraw = new GLESDebugDraw( PTM_RATIO );
 	mWorld->SetDebugDraw(m_debugDraw);
@@ -204,6 +238,118 @@ bool Gameplay::hasPlanetsNear(const CCPoint &pos, float radius)
 	return false;
 }
 
+void Gameplay::updateTrash(ccTime dt)
+{
+	for(int i = mTrashes.size(); i-- > 0; ) 
+	{
+		Trash* trash = mTrashes[i];
+		b2Vec2 trashCenter = trash->mTrashBody->GetPosition();
+		CCPoint trashScreen(trashCenter.x / PTM_RATIO, trashCenter.y / PTM_RATIO);
+
+		float dist = 1.0f;
+		b2Vec2 normalized;
+
+		if(outsideView(trashScreen, &dist, &normalized))
+		{
+			CCParticleSystemQuad* quad = ParticleFactory::explosion();
+			quad->setPosition(trashScreen);
+			quad->setDuration(0.4f);
+			world->addChild(quad);
+
+			world->removeChild(mTrashes[i]->getSprite(), true);
+			mWorld->DestroyBody(mTrashes[i]->mTrashBody);
+			delete mTrashes[i];
+
+			if(i + 1 < mTrashes.size())
+				mTrashes[i] = mTrashes.back();
+			mTrashes.pop_back();
+			continue;
+		}
+
+		trash->setPos(trashScreen);
+		trash->setAngle(trash->mTrashBody->GetAngle() / M_PI * 180.0f);
+
+		// dist *= 1.0f - exp(- dist / dt);
+
+		dist *= 3.0f;
+		dist += 0.8f;
+
+		float force = 50.0f / (dist);
+
+		normalized.x *= force;
+		normalized.y *= force;
+
+		trash->mTrashBody->ApplyForceToCenter(normalized);
+	}
+
+	srand(GetTickCount());
+
+	CCPoint center = sun->getPosition();
+
+	while(mTrashes.size() < MaxTrashes) 
+	{
+		float angle = 2 * M_PI * (float)rand() / RAND_MAX;
+		float distance = (float)rand() / RAND_MAX;
+		distance = MinShowPlanetDistance + distance * (MaxPlanetDistance - MinShowPlanetDistance);
+		CCPoint dir(cos(angle) * distance, sin(angle) * distance);
+		CCPoint trashPos(center.x + dir.x, center.y + dir.y);
+
+		if(outsideView(trashPos))
+			continue;
+		if(hasPlanetsNear(trashPos, PlanetsDistance))
+			continue;
+
+		const int MaxImages = 1;
+		static const char* images[MaxImages] = {
+			"satellite.png"
+		};
+
+		
+		Trash* trash = new Trash(images[rand() % MaxImages]);
+		trash->setPos(trashPos);
+		trash->trashSprite->setScale(0.5f);
+		world->addChild(trash->getSprite());
+
+		mTrashes.push_back(trash);
+
+		// Physical representation
+
+		b2BodyDef trashBodyDef;
+		trashBodyDef.type = b2_dynamicBody;
+		trashBodyDef.position.Set(trashPos.x*PTM_RATIO, trashPos.y*PTM_RATIO);
+		trashBodyDef.userData = trash;
+		b2Body* trashBody = mWorld->CreateBody(&trashBodyDef);
+
+		b2CircleShape shape;
+		shape.m_radius = trash->getSprite()->getContentSize().width / 2 * PTM_RATIO / 2;
+		//shape.m_p.Set(8.0f, 8.0f);
+		b2FixtureDef fd;
+		fd.shape = &shape;
+		fd.density = 10.0f;
+		fd.restitution = 1.0f;
+		fd.friction = 0.0f;
+		b2Fixture* trashFixture = trashBody->CreateFixture(&fd);
+
+		trash->mTrashBody = trashBody;
+		trash->mTrashFixture = trashFixture;
+		
+		const float AngleDiff = 2.0f * M_PI / 30.0f;
+		const float AngularMin = 20.0f / 180.0f * M_PI;
+		const float AngularMax = 60.0f / 180.0f * M_PI;
+		const float VelocityMin = 0.25 * PTM_RATIO;
+		const float VelocityMax = 1.0f * PTM_RATIO;
+
+		int directionLeft = rand()%2;
+		
+		angle = 2 * M_PI * (float)rand() / RAND_MAX;
+		float vel = VelocityMin + (float)rand() / RAND_MAX * (VelocityMax - VelocityMin);
+		float avel = AngularMin + (float)rand() / RAND_MAX * (AngularMax - AngularMin);
+		trash->mTrashBody->SetLinearVelocity(b2Vec2(cos(angle) * -vel, sin(angle) * -vel));
+		trash->mTrashBody->SetAngularVelocity(avel * directionLeft==0 ? -1 : 1);
+	}
+
+}
+
 void Gameplay::updatePlanets(ccTime dt)
 {
 	for(int i = mPlanets.size(); i-- > 0; ) 
@@ -217,6 +363,11 @@ void Gameplay::updatePlanets(ccTime dt)
 
 		if(outsideView(planetScreen, &dist, &normalized))
 		{
+			CCParticleSystemQuad* quad = ParticleFactory::explosion();
+			quad->setPosition(planetScreen);
+			quad->setDuration(0.4f);
+			world->addChild(quad);
+
 			removePlanet(i);
 			continue;
 		}
@@ -296,6 +447,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	int32 positionIterations = 1;
 
 	updatePlanets(dt);
+	updateTrash(dt);
 
 	mWorld->Step(dt, velocityIterations, positionIterations);
 
@@ -322,7 +474,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		// gravity
 		float bla;
 		float bla2;
-		float gravityForce = 38;
+		float gravityForce = 98;
 		b2Vec2 gravityVec;
 		b2Vec2 normalizedDistance = distance;
 		normalizedDistance.Normalize();
@@ -346,14 +498,14 @@ void Gameplay::updatePhysic( ccTime dt )
 	CCPoint engineForceVectorCC = mPlayer->direction;
 	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
 	if(drainImpulseFuel && impulseFuel > 0) {
-		engineForceVector *= 500;
+		engineForceVector *= 800;
 	} else {
 		engineForceVector *= 200;
 	}
 	globalForce += engineForceVector;
 
 	// sun gravity
-	float sunRadius = 800 * PTM_RATIO;
+	float sunRadius = 500 * PTM_RATIO;
 	b2Vec2 sunPosition = b2Vec2(sun->getPosition().x * PTM_RATIO, sun->getPosition().y * PTM_RATIO);
 	b2Vec2 sunGravityVector = sunPosition - mPlayer->mPlayerBody->GetPosition();
 	float playerSunDistance = sunGravityVector.Length() - sunRadius;
@@ -361,7 +513,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	{
 		float maxSunDistance = size.width * PTM_RATIO + fabs(sun->getPositionX() * PTM_RATIO) - sunRadius;
 		float sunGravityFactor = playerSunDistance / maxSunDistance;
-		float sunGravityForce = 500 * sunGravityFactor;
+		float sunGravityForce = 800 * sunGravityFactor;
 
 		sunGravityVector.Normalize();
 
@@ -382,8 +534,21 @@ void Gameplay::updatePhysic( ccTime dt )
 
 	mPlayer->mPlayer->setPosition(mPlayer->mOptimizedPos2);
 
-	//float oldRotation  = mPlayer->mPlayer->getRotation();
-	//mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
+	//mPlayer->mPlayer->setRotation(mPlayer->mPlayerBody->GetAngle());
+
+	if(!drainImpulseFuel) 
+	{
+		b2Vec2 velocityVec = mPlayer->mPlayerBody->GetLinearVelocity();
+		if(velocityVec.Length() > 0) 
+		{
+			CCPoint velVect = ccp(velocityVec.x, velocityVec.y);
+			velVect = ccpNormalize(velVect);
+			mPlayer->direction = velVect;
+
+			float angle = -CC_RADIANS_TO_DEGREES(ccpToAngle(velVect));
+			mPlayer->mPlayer->setRotation(angle);
+		}
+	}
 }
 
 void Gameplay::update(ccTime dt) {
@@ -435,7 +600,7 @@ void Gameplay::update(ccTime dt) {
 	char buf[256];
 	sprintf(buf, "%f %f", mPlayer->mPlayer->getPositionX(), mPlayer->mPlayer->getPositionY());
 	playerPos->setString(buf);
-
+	
 	updatePhysic(dt);
 
  	trail->setPosition(mPlayer->mPlayer->getPosition());
@@ -677,4 +842,14 @@ void Gameplay::showAchievement(const char *achievementName)
 	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
 	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
 	label->runAction(sequence);
+}
+
+void Listener::BeginContact(b2Contact* contact)
+{
+
+}
+
+void Listener::EndContact(b2Contact* contact)
+{
+
 }
