@@ -20,5 +20,5 @@ public:
 	float maxGravityRadius;
 	// Physical representation
 	b2Body* mPlanetBody;
-	b2Fixture* mPlanetFixture;
+	b2Fixture* mPlanetFixture;  
 };

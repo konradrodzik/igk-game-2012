@@ -3,11 +3,13 @@
 
 #define PTM_RATIO (1.0f/32.0f)
 
-const int MaxPlanets = 64;
+const int MaxPlanets = 32;
 const float MinPlanetDistance = 600;
 const float MinShowPlanetDistance = 1500;
 const float MaxPlanetDistance = 2000;
 const float PlanetsDistance = 200;
+const float PlayerDensity = 1.0f;
+const float PlanetDensity = 10000.0f;
 
 Gameplay::Gameplay() {
 }
@@ -159,7 +161,7 @@ void Gameplay::updatePlanets(ccTime dt)
 		dist *= 0.3f;
 		dist += 0.7f;
 
-		float force = 0.2f / (dist * dist);
+		float force = PlanetDensity / (dist * dist);
 
 		normalized.x *= force;
 		normalized.y *= force;
@@ -204,8 +206,8 @@ void Gameplay::updatePlanets(ccTime dt)
 		const float AngleDiff = 2.0f * M_PI / 30.0f;
 		const float AngularMin = 60.0f / 180.0f * M_PI;
 		const float AngularMax = 180.0f / 180.0f * M_PI;
-		const float VelocityMin = 1 * PTM_RATIO;
-		const float VelocityMax = 3 * PTM_RATIO;
+		const float VelocityMin = 0.02f * PTM_RATIO;
+		const float VelocityMax = 0.1f * PTM_RATIO;
 		
 		angle = 2 * M_PI * (float)rand() / RAND_MAX;
 		float vel = VelocityMin + (float)rand() / RAND_MAX * (VelocityMax - VelocityMin);
@@ -238,44 +240,81 @@ void Gameplay::updatePhysic( ccTime dt )
 		float maxRadius = planet->maxGravityRadius;
 
 		// rotating force
-		float force = 1500;
+		float force = 0;
 		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
 		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
 		forceVector.Normalize();
-		b2Vec2 F = force * forceVector;
+		b2Vec2 F = planet->mPlanetBody->GetAngularVelocity() * forceVector;
+
+
 
 		// gravity
 		float bla;
 		float bla2;
-		float gravityForce = 98;
+		float gravityForce = 100;
 		b2Vec2 gravityVec;
 		b2Vec2 normalizedDistance = distance;
 		normalizedDistance.Normalize();
+#if 0
+		if(distanceLength < planet->maxGravityRadius) {
+			bla = distanceLength / planet->maxGravityRadius;
+			float bla2 = distanceLength * distanceLength;
+			float bla3 = bla2 * bla;
+			gravityVec = gravityForce / bla2 * b2Vec2(normalizedDistance.x, normalizedDistance.y);
+			gravityVec += gravityForce / bla2 * b2Vec2(-normalizedDistance.y, normalizedDistance.x);
+			// gravityVec += PlayerDensity / PlanetDensity * planet->mPlanetBody->m_force;
+
+#else
 		if(distanceLength < planet->gravityRadius) {
 			bla = distanceLength / planet->gravityRadius; 
-			gravityVec = b2Vec2(bla*gravityForce*-normalizedDistance.x, bla*gravityForce*-normalizedDistance.y);
+			gravityVec = bla*gravityForce*b2Vec2(-normalizedDistance.x, -normalizedDistance.y);
+			gravityVec += bla*gravityForce*b2Vec2(-normalizedDistance.y, normalizedDistance.x);
 		} else if(distanceLength < planet->maxGravityRadius) {
 			bla = (distanceLength - planet->gravityRadius) / (planet->maxGravityRadius - planet->gravityRadius);
-			bla2 = -pow(2*bla-1, 2) + 1;
-			gravityVec = b2Vec2(bla2*gravityForce*normalizedDistance.x, bla2*gravityForce*normalizedDistance.y);
+			// bla2 = -pow(2*bla-1, 2) + 1;
+			gravityVec = bla*gravityForce*b2Vec2(normalizedDistance.x, normalizedDistance.y);
+			// gravityVec += bla*gravityForce*b2Vec2(-normalizedDistance.y, normalizedDistance.x);
+#endif
 		} else {
 			gravityVec = b2Vec2_zero;
+			continue;
 		}
 
-		F += gravityVec;
-
-		globalForce += F;
+		globalForce += gravityVec;
 	}
 
 	// Finally apply a force on the body in the direction of the "Planet"
 	mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
 	mPlayer->mPlayerBody->SetAngularVelocity(0);
-	mPlayer->mPlayerBody->ApplyForce(globalForce, mPlayer->mPlayerBody->GetPosition()/*+b2Vec2(0,5*PTM_RATIO)*/);
+	mPlayer->mPlayerBody->ApplyForceToCenter(globalForce);
 
-	mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO));
+	CCPoint pos(mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO);
+
+	mPlayer->mPlayer->setPosition(pos);
 
 	float oldRotation  = mPlayer->mPlayer->getRotation();
-	mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
+	// mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));	
+
+	if(!ccpFuzzyEqual(mPlayer->mLastPos, mPlayer->mPlayer->getPosition(), 0.0001f))
+	{
+		mPlayer->mLastVel = ccpSub(pos, mPlayer->mLastPos);
+		mPlayer->mLastVel.x /= dt;
+		mPlayer->mLastVel.y /= dt;
+		mPlayer->mLastPos = pos;
+		// float angle = CC_RADIANS_TO_DEGREES(-ccpToAngle(mPlayer->mLastVel));
+	}
+	else
+	{
+		// mPlayer->mLastVel = CCPoint();
+	}
+	float t = 1.0f - expf(- dt / 0.5f);
+	float tt = 1.0f - expf(- dt / 2.0f);
+	mPlayer->mOptimizedVel = ccpLerp(mPlayer->mOptimizedVel, mPlayer->mLastVel, t);
+	// mPlayer->mLastAngle = mPlayer->mLastAngle * (1.0f - t) + angle * t;
+	if(mPlayer && mPlayer->mPlayer)
+		mPlayer->mPlayer->setRotation(90.0f + CC_RADIANS_TO_DEGREES(-ccpToAngle(mPlayer->mOptimizedVel)));
+	mPlayer->mOptimizedPos = ccpLerp(mPlayer->mOptimizedPos, mPlayer->mLastPos, tt);
+	mPlayer->mPlayer->setPosition(pos);
 }
 
 void Gameplay::update(ccTime dt) {
@@ -297,7 +336,7 @@ void Gameplay::update(ccTime dt) {
 		mPlayer->mPlayer->setPositionX(mPlayer->mPlayer->getPositionX() + 100 * dt);
 	}
 
-	CCPoint sub = ccpSub(mPlayer->mPlayer->getPosition(), sun->getPosition());
+	CCPoint sub = ccpSub(mPlayer->mOptimizedPos, sun->getPosition());
 	float angle =  CC_RADIANS_TO_DEGREES(ccpToAngle(sub));
 	world->setRotation(angle);
 
@@ -332,9 +371,9 @@ void Gameplay::createPlayer(float posx, float posy)
 	// Define the dynamic body fixture.
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &dynamicBox;	
-	fixtureDef.density = 1.0f;
+	fixtureDef.density = PlayerDensity;
 	fixtureDef.friction = 0.0f;
-	fixtureDef.restitution = 0.5f;
+	fixtureDef.restitution = 0.0f;
 	b2Fixture* playerFixture = body->CreateFixture(&fixtureDef);
 
 	mPlayer->mPlayerBody = body;
@@ -382,7 +421,8 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	//shape.m_p.Set(8.0f, 8.0f);
 	b2FixtureDef fd;
 	fd.shape = &shape;
-	fd.restitution = 1.0f;
+	fd.density = PlanetDensity;
+	fd.restitution = 0.0f;
 	fd.friction = 0.0f;
 	b2Fixture* planetFixture = planetBody->CreateFixture(&fd);
 

@@ -15,5 +15,10 @@ public:
 	CCSprite* mPlayer;
 	b2Body* mPlayerBody;
 	b2Fixture* mPlayerFixture;
+	CCPoint mLastPos;
+	CCPoint mLastVel;
+	CCPoint mOptimizedVel;
+	CCPoint mOptimizedPos;
+	float mLastAngle;
 };
 
