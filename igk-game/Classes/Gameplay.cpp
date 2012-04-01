@@ -48,10 +48,6 @@ bool Gameplay::init()
 	world->setPosition(ccp(size.width / 2, size.height / 2));
 	addChild(world);
 
-	player = new Player();
-	player->setPosition(ccp(size.width / 2, size.height / 2));
-	world->addChild(player, 1);
-
 	// setup sun
 	sun = new Sun();
 	sun->setPosition(ccp(-sun->getContentSize().width / 2 + 400, world->getContentSize().height / 2));
@@ -63,11 +59,11 @@ bool Gameplay::init()
 	world->setPosition(ccp(world->getPositionX() - (0.5 + fabs(sunAnchorPositionX)) * world->getContentSize().width, world->getPositionY()));
 	
 
-
 	initPhysicalWorld();
 	scheduleUpdate();
 	CCSize screenSize = CCDirector::sharedDirector()->getWinSize();
 	createPlayer(screenSize.width/2, screenSize.height/2);
+	
 	addPlanet("planet_01.png", ccp(500, 100));
 	addPlanet("planet_02.png", ccp(500, 200));
 	addPlanet("planet_03.png", ccp(500, 300));
@@ -124,14 +120,14 @@ void Gameplay::updatePhysic( ccTime dt )
 void Gameplay::update(ccTime dt) {
 Input::instance()->update();
 	if(Input::instance()->keyDown(VK_UP)) {
-		player->setPositionY(player->getPositionY() + 3);
+		mPlayer->mPlayer->setPositionY(mPlayer->mPlayer->getPositionY() + 3);
 	}
 
 	if(Input::instance()->keyDown(VK_DOWN)) {
-		player->setPositionY(player->getPositionY() - 3);
+		mPlayer->mPlayer->setPositionY(mPlayer->mPlayer->getPositionY() - 3);
 	}
 
-	CCPoint sub = ccpSub(player->getPosition(), sun->getPosition());
+	CCPoint sub = ccpSub(mPlayer->mPlayer->getPosition(), sun->getPosition());
 	float angle =  CC_RADIANS_TO_DEGREES(ccpToAngle(sub));
 	world->setRotation(angle);
 
@@ -145,7 +141,7 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer = new Player;
 	mPlayer->mPlayer = CCSprite::spriteWithFile("astro.png");
 	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
-	addChild(mPlayer->mPlayer);
+	world->addChild(mPlayer->mPlayer);
 
 	// PHYSICAL REPRESENTATION
 	b2BodyDef bodyDef;
