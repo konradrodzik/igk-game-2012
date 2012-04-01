@@ -166,10 +166,10 @@ void Gameplay::updatePlanets(ccTime dt)
 
 		// dist *= 1.0f - exp(- dist / dt);
 
-		dist *= 0.3f;
-		dist += 0.7f;
+		dist *= 3.0f;
+		dist += 0.8f;
 
-		float force = 0.2f / (dist * dist);
+		float force = 5000.0f / (dist);
 
 		normalized.x *= force;
 		normalized.y *= force;
@@ -212,8 +212,8 @@ void Gameplay::updatePlanets(ccTime dt)
 		Planet* planetObj = addPlanet(images[rand() % MaxImages], planet);
 		
 		const float AngleDiff = 2.0f * M_PI / 30.0f;
-		const float AngularMin = 60.0f / 180.0f * M_PI;
-		const float AngularMax = 180.0f / 180.0f * M_PI;
+		const float AngularMin = 20.0f / 180.0f * M_PI;
+		const float AngularMax = 60.0f / 180.0f * M_PI;
 		const float VelocityMin = 1 * PTM_RATIO;
 		const float VelocityMax = 3 * PTM_RATIO;
 		
@@ -305,7 +305,14 @@ void Gameplay::updatePhysic( ccTime dt )
 	mPlayer->mPlayerBody->SetAngularVelocity(0);
 	mPlayer->mPlayerBody->ApplyForce(globalForce, mPlayer->mPlayerBody->GetPosition());
 
-	mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO));
+	CCPoint pos(mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO);
+	float t1 = 1.0f - exp(- dt / 0.5f);
+	float t2 = 1.0f - exp(- dt / 0.25f);
+
+	mPlayer->mOptimizedPos = ccpLerp(mPlayer->mOptimizedPos, pos, t1);
+	mPlayer->mOptimizedPos2 = ccpLerp(mPlayer->mOptimizedPos2, pos, t1);
+
+	mPlayer->mPlayer->setPosition(mPlayer->mOptimizedPos2);
 
 	//float oldRotation  = mPlayer->mPlayer->getRotation();
 	//mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
@@ -332,7 +339,7 @@ void Gameplay::update(ccTime dt) {
 		mPlayer->mPlayer->setPositionX(mPlayer->mPlayer->getPositionX() + 100 * dt);
 	}
 
-	CCPoint sub = ccpSub(mPlayer->mPlayer->getPosition(), sun->getPosition());
+	CCPoint sub = ccpSub(mPlayer->mOptimizedPos, sun->getPosition());
 	float angle =  CC_RADIANS_TO_DEGREES(ccpToAngle(sub));
 	world->setRotation(angle);
 
@@ -418,6 +425,7 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	//shape.m_p.Set(8.0f, 8.0f);
 	b2FixtureDef fd;
 	fd.shape = &shape;
+	fd.density = 1000.0f;
 	fd.restitution = 1.0f;
 	fd.friction = 0.0f;
 	b2Fixture* planetFixture = planetBody->CreateFixture(&fd);
@@ -437,6 +445,7 @@ void Gameplay::clearLevel()
 
 void Gameplay::draw()
 {
+#if 0
 	glDisable(GL_TEXTURE_2D);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -447,6 +456,7 @@ void Gameplay::draw()
 	glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+#endif
 }
 
 void Gameplay::playerJetpack()
