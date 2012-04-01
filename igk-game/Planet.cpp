@@ -67,3 +67,40 @@ void Planet::setGravityRadius( float radius )
 	gravitySprite->setScale(scale);
 }
 
+
+Trash::Trash( std::string planetSpriteName )
+{
+	trashSprite = new CCSprite;
+	trashSprite->initWithFile(planetSpriteName.c_str());
+
+	mTrashBody = NULL;
+	mTrashFixture = NULL;
+}
+
+Trash::~Trash()
+{
+	if(trashSprite != NULL) {
+		delete trashSprite;
+		trashSprite = NULL;
+	}
+}
+
+CCSprite* Trash::getSprite()
+{
+	return trashSprite;
+}
+
+void Trash::setPos( CCPoint pos )
+{
+	if(trashSprite) {
+		trashSprite->setPosition(pos);
+	}
+}
+
+void Trash::setAngle(float angle)
+{
+	if(trashSprite)
+	{
+		trashSprite->setRotation(angle);	
+	}
+}
