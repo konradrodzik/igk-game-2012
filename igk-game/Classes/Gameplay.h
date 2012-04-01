@@ -41,6 +41,7 @@ public:
 	void clearLevel();
 
 	void draw();
+	void playerJetpack();
 
 	virtual void ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent);
 	virtual void ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent);
@@ -54,6 +55,8 @@ private:
 	CCNode* world;
 	Sun* sun;
 	CCLabelTTF* playerPos;
+
+	CCSprite* cursor;
 
 	float impulseTimer;
 };
