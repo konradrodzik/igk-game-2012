@@ -31,7 +31,7 @@ bool WelcomeScene::init()
         CC_BREAK_IF(! CCLayer::init());
 
 		CCSize size = CCDirector::sharedDirector()->getWinSize();
-		CCSprite* pSprite = CCSprite::spriteWithFile("HelloWorld.png");
+		CCSprite* pSprite = CCSprite::spriteWithFile("title.png");
         CC_BREAK_IF(! pSprite);
 
         // Place the sprite on the center of the screen

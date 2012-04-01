@@ -66,6 +66,7 @@ public:
 	void showAchievement(const char*);
 
 	void jetpackCallback( CCNode* node, void* obj );
+	void explosionCallback( CCNode* node, void* obj );
 
 private:
 	CCSprite* mBackground;
@@ -94,11 +95,11 @@ private:
 	bool drainImpulseFuel;
 	CCLayerColor* impulseFuelIndicator;
 
-	CCSprite* mJetpakAnimTexture;
-	CCAnimation* mJetpakAnimation;
+	//CCSprite* mJetpakAnimTexture;
+	//CCAnimation* mJetpakAnimation;
 
-	CCSprite* mExplosionAnimTexture;
-	CCAnimation* mExplosionpakAnimation;
+	//CCSprite* mExplosionAnimTexture;
+	//CCAnimation* mExplosionpakAnimation;
 };
 
 #endif
