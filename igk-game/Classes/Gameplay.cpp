@@ -64,9 +64,9 @@ bool Gameplay::init()
 	CCSize screenSize = CCDirector::sharedDirector()->getWinSize();
 	createPlayer(screenSize.width/2, screenSize.height/2);
 	
-	addPlanet("planet_01.png", ccp(500, 100));
-	addPlanet("planet_02.png", ccp(500, 200));
-	addPlanet("planet_03.png", ccp(500, 300));
+	//addPlanet("planet_01.png", ccp(500, 100));
+	addPlanet("planet_02.png", ccp(500, 300));
+	//addPlanet("planet_03.png", ccp(500, 600));
 
 	return true;
 }
@@ -98,21 +98,46 @@ void Gameplay::updatePhysic( ccTime dt )
 
 	for(int i = 0; i < mPlanets.size(); ++i) {
 		Planet* planet = mPlanets[i];
+
 		b2Body* planetBody = planet->mPlanetBody;
 		b2CircleShape* planetShape = (b2CircleShape*)planet->mPlanetFixture->GetShape();
 
 		b2Vec2 planetCenter = planetBody->GetWorldPoint(planetShape->m_p);
-
 		b2Vec2 distance = planetCenter - mPlayer->mPlayerBody->GetPosition();
+		float distanceLength = sqrt(distance.x*distance.x+distance.y*distance.y);
 
-		float force = 250.0f / distance.LengthSquared(); // 150 can be changed to adjust the amount of force
-		distance.Normalize();
-		b2Vec2 F = force * distance;
+		float maxRadius = planet->getSprite()->getContentSize().width * PTM_RATIO;
+		float smallRadius = planet->getSprite()->getContentSize().width/2 * 1.6;
+		
+		float force = 500;// / distance.LengthSquared(); // 150 can be changed to adjust the amount of force
+		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
+
+
+		b2Vec2 gravityVec;
+		float gravityForce = 9.8;
+		float gravityStrength = clampf(1-(distanceLength)/maxRadius, 0, 1) * gravityForce;;
+		if(distanceLength > smallRadius) {
+			  gravityVec = b2Vec2(-distance.x, -distance.y);
+		} else {
+			 gravityVec = b2Vec2(distance.x, distance.y);
+		}
+		gravityVec.Normalize();
+		gravityVec *= gravityForce;
+
+		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
+		forceVector.Normalize();
+		b2Vec2 F = force * forceVector;
+		F += gravityVec;
 		// Finally apply a force on the body in the direction of the "Planet"
-		mPlayer->mPlayerBody->ApplyForce(F, mPlayer->mPlayerBody->GetPosition());
+		mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
+		mPlayer->mPlayerBody->SetAngularVelocity(0);
+		mPlayer->mPlayerBody->ApplyForce(F, mPlayer->mPlayerBody->GetPosition()/*+b2Vec2(0,5*PTM_RATIO)*/);
+
 
 
 		mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x * PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y * PTM_RATIO));
+		
+		float oldRotation  = mPlayer->mPlayer->getRotation();
 		mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
 	}
 }
@@ -178,7 +203,7 @@ void Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 
 	b2BodyDef planetBodyDef;
 	planetBodyDef.position.Set(position.x/PTM_RATIO, position.y/PTM_RATIO);
-	planetBodyDef.userData = mPlayer;
+	planetBodyDef.userData = planet;
 	b2Body* planetBody = mWorld->CreateBody(&planetBodyDef);
 
 	b2CircleShape shape;
