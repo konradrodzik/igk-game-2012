@@ -119,6 +119,11 @@ bool Gameplay::init()
 	impulseFuelIndicator->setPosition(grid->getPosition());
 	impulseFuelIndicator->setPositionY(impulseFuelIndicator->getPositionY() - grid->getContentSize().height);
 	addChild(impulseFuelIndicator);
+	
+	timeLabel = CCLabelTTF::labelWithString("Time: 0", "Verdana",30);
+	timeLabel->setAnchorPoint(ccp(0.5f, 0.5f));
+	timeLabel->setPosition(ccp(grid->getContentSize().width * 0.5f,grid->getContentSize().height * 0.5f));
+	grid->addChild(timeLabel);
 
 	scoreText = CCLabelTTF::labelWithString("Score: 0", "Verdana",30);
 	scoreText->setAnchorPoint(ccp(0.0f, 0.5f));
@@ -131,6 +136,7 @@ bool Gameplay::init()
 
 void Gameplay::initPhysicalWorld()
 {
+	totalTime = 0;
 	// Create Box2d world
 	b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
 	bool doSleep = false;
@@ -265,6 +271,8 @@ void Gameplay::updatePlanets(ccTime dt)
 
 void Gameplay::updatePhysic( ccTime dt )
 {
+	totalTime += dt;
+
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 	int32 velocityIterations = 8;
 	int32 positionIterations = 1;
@@ -362,7 +370,7 @@ void Gameplay::updatePhysic( ccTime dt )
 
 void Gameplay::update(ccTime dt) {
 	impulseTimer += dt;
-
+	updateScore();
 	if(drainImpulseFuel) {
 		impulseFuel -= dt * 30;
 		if(impulseFuel < 0) {
@@ -579,6 +587,16 @@ void Gameplay::updateScore()
 	char tab[255] = {0};
 	sprintf(tab, "Score: %i", mPlayer->score);
 	scoreText->setString(tab);
+	sprintf(tab, "Time: %.2f", totalTime);
+	timeLabel->setString(tab);
+
+	static int lastScored = 0;
+	int currentScore = (int)totalTime;
+	if (currentScore % 10 == 0 && lastScored != currentScore) {
+		lastScored = currentScore;
+		sprintf(tab, "You survived %.0f seconds, Great!", totalTime);
+		this->showAchievement(tab);
+	}
 }
 
 
@@ -590,19 +608,20 @@ void Gameplay::removeAchievement(CCNode *label)
 void Gameplay::showAchievement(const char *achievementName)
 {
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
-	CCLabelTTF *label = CCLabelTTF::labelWithString(achievementName, "Comic Sans", 32);
+	CCLabelTTF *label = CCLabelTTF::labelWithString(achievementName, "Comic Sans", 48);
 	label->setPosition(ccp(size.width * 0.5f, size.height * 0.5f));
 	label->setColor(ccc3(128,255, 0));
 	this->addChild(label, 4);
 
 	CCFadeIn *fadeIn = CCFadeIn::actionWithDuration(0.2f);
-	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(0.35f, 4, 4);
-	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(0.2f, rand() % 90 - 45);
-	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(0.35f);
+	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(0.4f, 4, 4);
+	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(0.4f, rand() % 60 - 30);
+	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(0.4f);
 	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
+	CCDelayTime *delayTime = CCDelayTime::actionWithDuration(0.2f);
 
-	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, rotateBy, NULL);
-	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, scaleBy, NULL);
-	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, spawn2, callFunc, NULL);
+	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, NULL);
+	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
+	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
 	label->runAction(sequence);
 }
