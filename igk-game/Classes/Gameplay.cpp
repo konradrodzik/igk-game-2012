@@ -258,10 +258,19 @@ void Gameplay::draw()
 void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 {
 	CCTouch* touch = (CCTouch*)pTouches->anyObject();
-	CCPoint p = CCDirector::sharedDirector()->convertToGL(touch->locationInView(touch->view()));
+	CCPoint p = world->convertTouchToNodeSpace(touch);
 
 	CCParticleSystem* particle = ParticleFactory::explosion();
 	particle->setPosition(p);
 	world->addChild(particle, 1);
 }
 
+void ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
+{
+
+}
+
+void ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent);
+{
+
+}
