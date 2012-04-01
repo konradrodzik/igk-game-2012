@@ -5,7 +5,13 @@
 
 using namespace cocos2d;
 
-class Player
+class BaseObject
+{
+public:
+	virtual ~BaseObject() {}
+};
+
+class Player : public BaseObject
 {
 public:
 	Player(void);

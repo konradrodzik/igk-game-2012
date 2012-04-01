@@ -104,3 +104,46 @@ void Trash::setAngle(float angle)
 		trashSprite->setRotation(angle);	
 	}
 }
+
+Rocket::Rocket( std::string planetSpriteName )
+{
+	rocketSprite = new CCSprite;
+	rocketSprite->initWithFile(planetSpriteName.c_str());
+
+	mRocketBody = NULL;
+	mRocketFixture = NULL;
+}
+
+Rocket::~Rocket()
+{
+	if(rocketSprite != NULL) {
+		delete rocketSprite;
+		rocketSprite = NULL;
+	}
+#if 0
+	if(mRocketTrail != NULL) {
+		delete mRocketTrail;
+		mRocketTrail = NULL;
+	}
+#endif
+}
+
+CCSprite* Rocket::getSprite()
+{
+	return rocketSprite;
+}
+
+void Rocket::setPos( CCPoint pos )
+{
+	if(rocketSprite) {
+		rocketSprite->setPosition(pos);
+	}
+}
+
+void Rocket::setAngle(float angle)
+{
+	if(rocketSprite)
+	{
+		rocketSprite->setRotation(angle);	
+	}
+}
