@@ -48,22 +48,28 @@ bool Gameplay::init()
 	playerPos->setAnchorPoint(ccp(0,0));
 	playerPos->setPosition(ccp(100, 100));
 
-	// Background
-	mBackground = CCSprite::spriteWithFile("space.png");
-	mBackground->setAnchorPoint(ccp(0,0));
-	mBackground->setPosition(ccp(0,0));
-	addChild(mBackground);
-
 	world = CCNode::node();
 	world->setContentSize(size);
 	world->setAnchorPoint(ccp(0.5, 0.5));
 	world->setPosition(ccp(size.width / 2, size.height / 2));
 	addChild(world);
+	
+	// Background
+	for(int x = -3; x <= 3; ++x) {
+		for(int y = -3; y <= 3; ++y) {
+			mBackground = CCSprite::spriteWithFile("space.png");
+			mBackground->setAnchorPoint(ccp(0,0));
+			mBackground->setPosition(ccp(1024*x,768*y));
+			mBackground->setFlipX((x&1) != 0);
+			mBackground->setFlipY((y&1) != 0);
+			world->addChild(mBackground);
+		}
+	}
 
 	// setup sun
 	sun = new Sun();
 	sun->setPosition(ccp(-sun->getContentSize().width / 2 + 400, world->getContentSize().height / 2));
-	world->addChild(sun, 100);
+	world->addChild(sun);
 	world->addChild(playerPos);
 
 	// setup world rotation around sun
@@ -367,8 +373,8 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	planet->setPos(position);
 	world->addChild(planet->getSprite());
 
-	// inside we are multiplying by PTM
-	planet->setGravityRadius(planet->getSprite()->getContentSize().width);
+	planet->gravityRadius = planet->getSprite()->getContentSize().width * PTM_RATIO;
+	planet->maxGravityRadius = 2*planet->gravityRadius;
 
 	mPlanets.push_back(planet);
 
