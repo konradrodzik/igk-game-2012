@@ -422,12 +422,12 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	world->addChild(particle, 1);
 }
 
-void ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
+void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
 {
 
 }
 
-void ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent);
+void Gameplay::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
 
 }
