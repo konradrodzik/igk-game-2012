@@ -8,6 +8,7 @@ const float MinPlanetDistance = 600;
 const float MinShowPlanetDistance = 1500;
 const float MaxPlanetDistance = 2000;
 const float PlanetsDistance = 200;
+const float BoundsDistance = 1640.0f;
 
 Gameplay::Gameplay() {
 }
@@ -79,6 +80,17 @@ bool Gameplay::init()
 
 	cursor = CCSprite::spriteWithFile("player.png");
 	cursor->retain();
+	
+	CCParticleSystemQuad* galaxy = new CCParticleGalaxy();
+	galaxy->initWithFile("ExplodingRing.plist");
+	galaxy->setEmitterMode(1);
+	galaxy->setPosition(sun->getPosition());
+	galaxy->setStartRadius(BoundsDistance - 1);
+	galaxy->setEndRadius(BoundsDistance + 1);
+	galaxy->setDuration(100000.0f);
+	galaxy->setStartSize(25);
+	galaxy->setEndSize(40);
+	world->addChild(galaxy);
 
 	initPhysicalWorld();
 	scheduleUpdate();
