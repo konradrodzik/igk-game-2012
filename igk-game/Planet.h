@@ -17,7 +17,7 @@ public:
 private:
 	CCSprite* planetSprite;
 	float gravityRadius;
-
+	float maxGravityRadius;
 public:
 	// Physical representation
 	b2Body* mPlanetBody;

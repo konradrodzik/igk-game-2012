@@ -122,11 +122,41 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="Resources\astro.png" />
+    <None Include="Resources\BoilingFoam.plist" />
+    <None Include="Resources\BurstPipe.plist" />
     <None Include="Resources\CloseNormal.png" />
     <None Include="Resources\CloseSelected.png" />
+    <None Include="Resources\Comet.plist" />
+    <None Include="Resources\Comet.png" />
+    <None Include="Resources\ExplodingRing.plist" />
+    <None Include="Resources\fire-grayscale.png" />
+    <None Include="Resources\fire.png" />
+    <None Include="Resources\Flower.plist" />
+    <None Include="Resources\Fog.png" />
+    <None Include="Resources\Galaxy.plist" />
     <None Include="Resources\HelloWorld.png" />
+    <None Include="Resources\LavaFlow.plist" />
+    <None Include="Resources\moon.png" />
+    <None Include="Resources\particles-hd.png" />
+    <None Include="Resources\particles.png" />
+    <None Include="Resources\Phoenix.plist" />
+    <None Include="Resources\planet_01.png" />
+    <None Include="Resources\planet_02.png" />
+    <None Include="Resources\planet_03.png" />
     <None Include="Resources\player.png" />
+    <None Include="Resources\snow.png" />
+    <None Include="Resources\space.png" />
+    <None Include="Resources\Spiral.plist" />
+    <None Include="Resources\stars-grayscale.png" />
+    <None Include="Resources\stars.png" />
+    <None Include="Resources\stars2-grayscale.png" />
+    <None Include="Resources\stars2.png" />
+    <None Include="Resources\streak.png" />
     <None Include="Resources\sun.jpg" />
+    <None Include="Resources\sun.png" />
+    <None Include="Resources\sun_static.png" />
+    <None Include="Resources\Upsidedown.plist" />
     <None Include="win32\res\igk-game.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +170,7 @@
     <ClInclude Include="Classes\WelcomeScene.h" />
     <ClInclude Include="Classes\MenuScene.h" />
     <ClInclude Include="GLES-Render.h" />
+    <ClInclude Include="ParticleFactory.h" />
     <ClInclude Include="Planet.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Sun.h" />
@@ -153,6 +184,7 @@
     <ClCompile Include="Classes\WelcomeScene.cpp" />
     <ClCompile Include="Classes\MenuScene.cpp" />
     <ClCompile Include="GLES-Render.cpp" />
+    <ClCompile Include="ParticleFactory.cpp" />
     <ClCompile Include="Planet.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Sun.cpp" />
