@@ -42,6 +42,8 @@ bool Gameplay::init()
 	setIsTouchEnabled(true);
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
+	impulseTimer = 2;
+
 	playerPos = CCLabelTTF::labelWithString("text", "Verdana", 16);
 	playerPos->setAnchorPoint(ccp(0,0));
 	playerPos->setPosition(ccp(100, 100));
@@ -268,9 +270,9 @@ void Gameplay::updatePhysic( ccTime dt )
 	}
 
 	// Finally apply a force on the body in the direction of the "Planet"
-	mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
+	//mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
 	mPlayer->mPlayerBody->SetAngularVelocity(0);
-	mPlayer->mPlayerBody->ApplyForce(globalForce, mPlayer->mPlayerBody->GetPosition()/*+b2Vec2(0,5*PTM_RATIO)*/);
+	mPlayer->mPlayerBody->ApplyForce(globalForce, mPlayer->mPlayerBody->GetPosition());
 
 	mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO));
 
@@ -279,6 +281,8 @@ void Gameplay::updatePhysic( ccTime dt )
 }
 
 void Gameplay::update(ccTime dt) {
+	impulseTimer += dt;
+
 	Input::instance()->update();
 
 	if(Input::instance()->keyDown(VK_UP)) {
@@ -327,7 +331,6 @@ void Gameplay::createPlayer(float posx, float posy)
 	// Define another box shape for our dynamic body.
 	b2PolygonShape dynamicBox;
 	dynamicBox.SetAsBox(0.5f, 0.5f);
-	//dynamicBox.SetAsBox(mPlayer->getContentSize().width / 2.0f / PTM_RATIO, mPlayer->getContentSize().height / 2.0f / PTM_RATIO);//These are mid points for our 1m box
 
 	// Define the dynamic body fixture.
 	b2FixtureDef fixtureDef;
@@ -415,11 +418,30 @@ void Gameplay::draw()
 
 void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 {
-	CCTouch* touch = (CCTouch*)pTouches->anyObject();
-	CCPoint p = CCDirector::sharedDirector()->convertToGL(touch->locationInView(touch->view()));
+	if(impulseTimer > 2) 
+	{
+		impulseTimer = 0;
+		CCTouch* touch = (CCTouch*)pTouches->anyObject();
+		CCPoint p = world->convertTouchToNodeSpace(touch);
 
-	CCParticleSystem* particle = ParticleFactory::explosion();
-	particle->setPosition(p);
-	world->addChild(particle, 1);
+		CCParticleSystem* particle = ParticleFactory::explosion();
+		particle->setPosition(p);
+		world->addChild(particle, 1);
+
+		CCPoint dir = ccpForAngle(CC_DEGREES_TO_RADIANS(90 + mPlayer->mPlayer->getRotation()));
+
+		b2Vec2 direction = b2Vec2(dir.x, dir.y);
+		direction *= 10;
+		mPlayer->mPlayerBody->ApplyLinearImpulse(direction, mPlayer->mPlayerBody->GetPosition());
+	}
 }
 
+void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
+{
+
+}
+
+void Gameplay::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
+{
+
+}
