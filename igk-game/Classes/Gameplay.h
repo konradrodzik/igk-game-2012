@@ -2,8 +2,13 @@
 #define __GAMEPLAY_H__
 
 #include "cocos2d.h"
+#include "GLES-Render.h"
 #include "Sun.h"
+#include "Planet.h"
 #include "Player.h"
+#include "Box2D/Box2D.h"
+
+
 
 using namespace cocos2d;
 
@@ -22,11 +27,30 @@ public:
 	static CCScene* scene();
 	LAYER_NODE_FUNC(Gameplay);
 
-	void update(ccTime dt);
+	void createPlayer(float posx, float posy);
 
+	void initPhysicalWorld();
+
+	void updatePhysic(ccTime dt);
+
+	void update(ccTime dt);
+	
+	void addPlanet(std::string planetSpriteName, CCPoint position);
+
+	void clearLevel();
+
+	void draw();
+	
 	virtual void ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent);
 	virtual void ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent);
 	virtual void ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent);
+
+
+private:
+	CCSprite* mBackground;
+	b2World* mWorld;
+	CCSprite* mPlayer;
+	std::vector<Planet*> mPlanets;
 };
 
 #endif
