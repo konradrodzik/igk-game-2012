@@ -166,10 +166,10 @@ bool Gameplay::init()
 
 
 	// Init explosion anim
-	CCSprite* mExplosionAnimTexture;
+	/*CCSprite* mExplosionAnimTexture;
 	CCAnimation* mExplosionpakAnimation;
 	mExplosionAnimTexture = new CCSprite;
-	mExplosionAnimTexture->initWithFile("jetpack.png");
+	mExplosionAnimTexture->initWithFile("explosion.png");
 	mExplosionpakAnimation = new CCAnimation();
 	mExplosionpakAnimation->initWithFrames(NULL, 0.03f);
 	for(int y = 0; y < 7; ++y) {
@@ -179,7 +179,7 @@ bool Gameplay::init()
 			CCSpriteFrame* frame = CCSpriteFrame::frameWithTexture(mExplosionAnimTexture->getTexture(), CCRect(x*width, y*height, width, height));
 			mExplosionpakAnimation->addFrame(frame);
 		}
-	}
+	}*/
 
 	return true;
 }
@@ -255,6 +255,21 @@ void Gameplay::updateTrash(ccTime dt)
 			quad->setPosition(trashScreen);
 			quad->setDuration(0.4f);
 			world->addChild(quad);
+			
+			
+			/*CCSprite* explosion = CCSprite::spriteWithTexture(mExplosionAnimTexture->getTexture());
+			world->addChild(explosion);
+			 
+				
+			
+			CCActionInterval* expAction = CCAnimate::actionWithAnimation(mExplosionpakAnimation);
+			CCCallFuncND* callfunc = CCCallFuncND::actionWithTarget(this, callfuncND_selector(Gameplay::explosionCallback), NULL);
+			CCSequence* seq = CCSequence::actionOneTwo(expAction, callfunc);
+			explosion->stopAllActions();
+			explosion->setIsVisible(true);
+			explosion->runAction(seq);*/
+			
+
 
 			world->removeChild(mTrashes[i]->getSprite(), true);
 			mWorld->DestroyBody(mTrashes[i]->mTrashBody);
@@ -615,7 +630,7 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
 	world->addChild(mPlayer->mPlayer, 3);
 
-	// Jetpack animation
+	/*// Jetpack animation
 	mJetpakAnimTexture = CCSprite::spriteWithFile("jetpack.png");
 	mJetpakAnimation = new CCAnimation();
 	mJetpakAnimation->initWithFrames(NULL, 0.03f);
@@ -632,7 +647,7 @@ void Gameplay::createPlayer(float posx, float posy)
 	mJetpakAnimTexture->setPosition(ccp(14, 36));
 	world->addChild(mJetpakAnimTexture, 2);
 	mJetpakAnimTexture->setIsVisible(false);
-
+	*/
 	
 
 
@@ -766,13 +781,6 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	cursor->setPosition(p);
 	world->addChild(cursor);
 
-	CCActionInterval* jetpackAction = CCAnimate::actionWithAnimation(mJetpakAnimation);
-	CCCallFuncND* callfunc = CCCallFuncND::actionWithTarget(this, callfuncND_selector(Gameplay::jetpackCallback), NULL);
-	CCSequence* seq = CCSequence::actionOneTwo(jetpackAction, callfunc);
-	mJetpakAnimTexture->stopAllActions();
-	mJetpakAnimTexture->setIsVisible(true);
-	mJetpakAnimTexture->runAction(seq);
-
 
 	playerLookAt(cursor->getPosition());
 	drainImpulseFuel = true;
@@ -780,8 +788,15 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 
 void Gameplay::jetpackCallback( CCNode* node, void* obj )
 {
-	mJetpakAnimTexture->stopAllActions();
-	mJetpakAnimTexture->setIsVisible(false);
+	
+}
+
+void Gameplay::explosionCallback( CCNode* node, void* obj )
+{
+	CCNode* kurwa = (CCNode*)obj;
+	kurwa->stopAllActions();
+	kurwa->setIsVisible(false);
+	world->removeChild(kurwa, true);
 }
 
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
