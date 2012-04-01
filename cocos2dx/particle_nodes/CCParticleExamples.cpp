@@ -396,7 +396,7 @@ bool CCParticleMeteor::initWithTotalParticles(unsigned int numberOfParticles)
 		m_fDuration = kCCParticleDurationInfinity;
 
 		// Gravity Mode
-		m_nEmitterMode = kCCParticleModeGravity;
+		m_nEmitterMode = kCCParticleModeRadius;
 
 		// Gravity Mode: gravity
 		//modeA.gravity = ccp(-200,200);

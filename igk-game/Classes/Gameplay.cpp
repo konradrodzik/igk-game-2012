@@ -127,7 +127,7 @@ bool Gameplay::init()
 	//particleSystem->setPosition(screenSize.width / 2, screenSize.height / 2);
 	//world->addChild(particleSystem, 1);
 	trail = ParticleFactory::meteor(); 
-	//trail->setPositionType(kCCPositionTypeRelative);
+	trail->setPositionType(kCCPositionTypeRelative);
 	trail->setPosition(mPlayer->mPlayer->getPosition());
 	trail->setDuration(20.0f);
 	world->addChild(trail, 1);
@@ -451,7 +451,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
 		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
 		forceVector.Normalize();
-		b2Vec2 F = b2Vec2_zero;// force * forceVector;
+		b2Vec2 F = force * forceVector;
 
 		// gravity
 		float bla;
@@ -518,19 +518,19 @@ void Gameplay::updatePhysic( ccTime dt )
 
 	//mPlayer->mPlayer->setRotation(mPlayer->mPlayerBody->GetAngle());
 
-	if(!drainImpulseFuel) 
-	{
-		b2Vec2 velocityVec = mPlayer->mPlayerBody->GetLinearVelocity();
-		if(velocityVec.Length() > 0) 
-		{
-			CCPoint velVect = ccp(velocityVec.x, velocityVec.y);
-			velVect = ccpNormalize(velVect);
-			mPlayer->direction = velVect;
+	//if(!drainImpulseFuel) 
+	//{
+	//	b2Vec2 velocityVec = mPlayer->mPlayerBody->GetLinearVelocity();
+	//	if(velocityVec.Length() > 0) 
+	//	{
+	//		CCPoint velVect = ccp(velocityVec.x, velocityVec.y);
+	//		velVect = ccpNormalize(velVect);
+	//		mPlayer->direction = velVect;
 
-			float angle = -CC_RADIANS_TO_DEGREES(ccpToAngle(velVect));
-			mPlayer->mPlayer->setRotation(angle);
-		}
-	}
+	//		float angle = -CC_RADIANS_TO_DEGREES(ccpToAngle(velVect));
+	//		mPlayer->mPlayer->setRotation(angle);
+	//	}
+	//}
 }
 
 void Gameplay::update(ccTime dt) {
@@ -586,7 +586,7 @@ void Gameplay::update(ccTime dt) {
 	updatePhysic(dt);
 
  	trail->setPosition(mPlayer->mPlayer->getPosition());
-	trail->setGravity(ccpMult(mPlayer->direction, 10));
+	//trail->setGravity(ccpMult(mPlayer->direction, 10));
 }
 
 void Gameplay::createPlayer(float posx, float posy)
