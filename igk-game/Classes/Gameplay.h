@@ -54,6 +54,8 @@ private:
 	CCNode* world;
 	Sun* sun;
 	CCLabelTTF* playerPos;
+
+	float impulseTimer;
 };
 
 #endif

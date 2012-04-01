@@ -42,6 +42,8 @@ bool Gameplay::init()
 	setIsTouchEnabled(true);
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
+	impulseTimer = 2;
+
 	playerPos = CCLabelTTF::labelWithString("text", "Verdana", 16);
 	playerPos->setAnchorPoint(ccp(0,0));
 	playerPos->setPosition(ccp(100, 100));
@@ -268,7 +270,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	}
 
 	// Finally apply a force on the body in the direction of the "Planet"
-	mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
+	//mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
 	mPlayer->mPlayerBody->SetAngularVelocity(0);
 	mPlayer->mPlayerBody->ApplyForce(globalForce, mPlayer->mPlayerBody->GetPosition());
 
@@ -279,6 +281,8 @@ void Gameplay::updatePhysic( ccTime dt )
 }
 
 void Gameplay::update(ccTime dt) {
+	impulseTimer += dt;
+
 	Input::instance()->update();
 
 	if(Input::instance()->keyDown(VK_UP)) {
@@ -414,12 +418,22 @@ void Gameplay::draw()
 
 void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 {
-	CCTouch* touch = (CCTouch*)pTouches->anyObject();
-	CCPoint p = world->convertTouchToNodeSpace(touch);
+	if(impulseTimer > 2) 
+	{
+		impulseTimer = 0;
+		CCTouch* touch = (CCTouch*)pTouches->anyObject();
+		CCPoint p = world->convertTouchToNodeSpace(touch);
 
-	CCParticleSystem* particle = ParticleFactory::explosion();
-	particle->setPosition(p);
-	world->addChild(particle, 1);
+		CCParticleSystem* particle = ParticleFactory::explosion();
+		particle->setPosition(p);
+		world->addChild(particle, 1);
+
+		CCPoint dir = ccpForAngle(CC_DEGREES_TO_RADIANS(90 + mPlayer->mPlayer->getRotation()));
+
+		b2Vec2 direction = b2Vec2(dir.x, dir.y);
+		direction *= 10;
+		mPlayer->mPlayerBody->ApplyLinearImpulse(direction, mPlayer->mPlayerBody->GetPosition());
+	}
 }
 
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
