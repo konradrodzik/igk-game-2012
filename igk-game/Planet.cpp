@@ -58,7 +58,7 @@ void Planet::setGravityRadius( float radius )
 	//int factor = (radius + 2*radius);
 	//int randomRadius = rand()%factor + radius;
 	gravityRadius = radius * PTM_RATIO;
-	maxGravityRadius = gravityRadius*radius;
+	maxGravityRadius = gravityRadius*2;
 
 	// change scale of gravity radius sprite
 	float gravitySpriteSize = gravitySprite->getContentSize().width;
