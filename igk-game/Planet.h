@@ -13,10 +13,9 @@ public:
 	CCSprite* getSprite();
 
 	void setPos(CCPoint pos);
-private:
+public:
 	CCSprite* planetSprite;
 	float gravityRadius;
-
 public:
 	// Physical representation
 	b2Body* mPlanetBody;
