@@ -26,7 +26,7 @@
     </Filter>
     <Filter Include="Classes\KeyboardHandling">
       <UniqueIdentifier>{ab650261-694c-4869-b585-95efcaa2b281}</UniqueIdentifier>
-    </Filter
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\res\igk-game.ico">
