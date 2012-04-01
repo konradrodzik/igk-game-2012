@@ -243,7 +243,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		float maxRadius = planet->maxGravityRadius;
 
 		// rotating force
-		float force = 1500;
+		float force = 1000;
 		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
 		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
 		forceVector.Normalize();
@@ -301,8 +301,8 @@ void Gameplay::updatePhysic( ccTime dt )
 
 	mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO));
 
-	float oldRotation  = mPlayer->mPlayer->getRotation();
-	mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
+	//float oldRotation  = mPlayer->mPlayer->getRotation();
+	//mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
 }
 
 void Gameplay::update(ccTime dt) {
@@ -367,6 +367,8 @@ void Gameplay::createPlayer(float posx, float posy)
 
 	mPlayer->mPlayerBody = body;
 	mPlayer->mPlayerFixture = playerFixture;
+
+	mPlayer->direction = ccp(0, 1);
 }
 
 void Gameplay::removePlanet(int i)
@@ -454,6 +456,14 @@ void Gameplay::playerJetpack()
 	}
 }
 
+void Gameplay::playerLookAt(CCPoint p)
+{
+	CCPoint dir = ccpSub(p, mPlayer->mPlayer->getPosition());
+	mPlayer->direction = ccpNormalize(dir);
+	float angle = -CC_RADIANS_TO_DEGREES(ccpToAngle(dir)) + 90;
+	mPlayer->mPlayer->setRotation(angle);
+}
+
 void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 {
 	CCTouch* touch = (CCTouch*)pTouches->anyObject();
@@ -461,6 +471,8 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 
 	cursor->setPosition(p);
 	world->addChild(cursor);
+
+	playerLookAt(cursor->getPosition());
 }
 
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
@@ -469,9 +481,11 @@ void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
 	CCPoint p = world->convertTouchToNodeSpace(touch);
 
 	cursor->setPosition(p);
+	playerLookAt(cursor->getPosition());
 }
 
 void Gameplay::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
+	playerLookAt(cursor->getPosition());
 	world->removeChild(cursor, false);
 }
