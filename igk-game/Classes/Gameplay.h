@@ -48,7 +48,7 @@ public:
 	void removePlanet(int i);
 	void removeTrash(int i);
 	void removeRocket(int i);
-	bool outsideView(const CCPoint &pos, float* distance = NULL, b2Vec2* normalized = NULL);
+	bool outsideView(const CCPoint &pos, float* distance = NULL, b2Vec2* normalized = NULL, bool inner = false);
 	bool hasPlanetsNear(const CCPoint &pos, float radius);
 	
 	Planet* addPlanet(std::string planetSpriteName, CCPoint position);
