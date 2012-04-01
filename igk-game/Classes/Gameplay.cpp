@@ -422,8 +422,9 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	planet->setPos(position);
 	world->addChild(planet->getSprite());
 
-	planet->gravityRadius = planet->getSprite()->getContentSize().width * PTM_RATIO;
-	planet->maxGravityRadius = 2*planet->gravityRadius;
+	planet->setGravityRadius(planet->getSprite()->getContentSize().width);
+	//planet->gravityRadius = planet->getSprite()->getContentSize().width * PTM_RATIO;
+	//planet->maxGravityRadius = 2*planet->gravityRadius;
 
 	mPlanets.push_back(planet);
 
