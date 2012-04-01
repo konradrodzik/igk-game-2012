@@ -42,10 +42,6 @@ bool Gameplay::init()
 	mBackground->setPosition(ccp(0,0));
 	addChild(mBackground);
 
-	player = new Player();
-	player->setPosition(ccp(size.width / 2, size.height / 2));
-	this->addChild(player, 1);
-
 	world = CCNode::node();
 	world->setContentSize(size);
 	world->setAnchorPoint(ccp(0.5, 0.5));
@@ -63,11 +59,11 @@ bool Gameplay::init()
 	world->setPosition(ccp(world->getPositionX() - (0.5 + fabs(sunAnchorPositionX)) * world->getContentSize().width, world->getPositionY()));
 	
 
-
 	initPhysicalWorld();
 	scheduleUpdate();
 	CCSize screenSize = CCDirector::sharedDirector()->getWinSize();
 	createPlayer(screenSize.width/2, screenSize.height/2);
+	
 	addPlanet("planet_01.png", ccp(500, 100));
 	addPlanet("planet_02.png", ccp(500, 200));
 	addPlanet("planet_03.png", ccp(500, 300));
@@ -124,12 +120,16 @@ void Gameplay::updatePhysic( ccTime dt )
 void Gameplay::update(ccTime dt) {
 Input::instance()->update();
 	if(Input::instance()->keyDown(VK_UP)) {
-		world->setRotation(world->getRotation() + 1);
+		mPlayer->mPlayer->setPositionY(mPlayer->mPlayer->getPositionY() + 3);
 	}
 
 	if(Input::instance()->keyDown(VK_DOWN)) {
-		world->setRotation(world->getRotation() - 1);
+		mPlayer->mPlayer->setPositionY(mPlayer->mPlayer->getPositionY() - 3);
 	}
+
+	CCPoint sub = ccpSub(mPlayer->mPlayer->getPosition(), sun->getPosition());
+	float angle =  CC_RADIANS_TO_DEGREES(ccpToAngle(sub));
+	world->setRotation(angle);
 
 	updatePhysic(dt);
 }
@@ -141,7 +141,7 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer = new Player;
 	mPlayer->mPlayer = CCSprite::spriteWithFile("astro.png");
 	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
-	addChild(mPlayer->mPlayer);
+	world->addChild(mPlayer->mPlayer);
 
 	// PHYSICAL REPRESENTATION
 	b2BodyDef bodyDef;
@@ -170,7 +170,7 @@ void Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 {
 	Planet* planet = new Planet(planetSpriteName);
 	planet->setPos(position);
-	addChild(planet->getSprite());
+	world->addChild(planet->getSprite());
 
 	mPlanets.push_back(planet);
 

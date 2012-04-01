@@ -14,10 +14,6 @@
 using namespace cocos2d;
 
 class Gameplay : public cocos2d::CCLayer {
-	CCNode* world;
-	Sun* sun;
-	Player* player;
-
 public:
 	Gameplay();
 
@@ -47,6 +43,8 @@ private:
 	b2World* mWorld;
 	std::vector<Planet*> mPlanets;
 	Player* mPlayer;
+	CCNode* world;
+	Sun* sun;
 };
 
 #endif
