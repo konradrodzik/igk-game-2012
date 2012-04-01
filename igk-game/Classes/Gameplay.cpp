@@ -554,6 +554,14 @@ void Gameplay::updateScore()
 	scoreText->setString(tab);
 	sprintf(tab, "Time: %.2f", totalTime);
 	timeLabel->setString(tab);
+
+	static int lastScored = 0;
+	int currentScore = (int)totalTime;
+	if (currentScore % 10 == 0 && lastScored != currentScore) {
+		lastScored = currentScore;
+		sprintf(tab, "You survived %.0f seconds, Great!", totalTime);
+		this->showAchievement(tab);
+	}
 }
 
 
@@ -565,19 +573,20 @@ void Gameplay::removeAchievement(CCNode *label)
 void Gameplay::showAchievement(const char *achievementName)
 {
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
-	CCLabelTTF *label = CCLabelTTF::labelWithString(achievementName, "Comic Sans", 32);
+	CCLabelTTF *label = CCLabelTTF::labelWithString(achievementName, "Comic Sans", 48);
 	label->setPosition(ccp(size.width * 0.5f, size.height * 0.5f));
 	label->setColor(ccc3(128,255, 0));
 	this->addChild(label, 4);
 
 	CCFadeIn *fadeIn = CCFadeIn::actionWithDuration(0.2f);
-	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(0.35f, 4, 4);
-	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(0.2f, rand() % 90 - 45);
-	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(0.35f);
+	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(0.4f, 4, 4);
+	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(0.4f, rand() % 60 - 30);
+	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(0.4f);
 	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
+	CCDelayTime *delayTime = CCDelayTime::actionWithDuration(0.2f);
 
-	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, rotateBy, NULL);
-	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, scaleBy, NULL);
-	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, spawn2, callFunc, NULL);
+	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, NULL);
+	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
+	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
 	label->runAction(sequence);
 }
