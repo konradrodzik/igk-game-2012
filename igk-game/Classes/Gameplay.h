@@ -70,8 +70,10 @@ private:
 	CCSprite* hud;
 	CCSprite* grid;
 	CCLabelTTF* scoreText;
+	CCLabelTTF* timeLabel;
 	std::vector<CCSprite*> mLifeSprites;
 	CCParticleSystem *trail;
+	ccTime totalTime;
 };
 
 #endif

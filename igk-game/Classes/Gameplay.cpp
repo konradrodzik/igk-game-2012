@@ -112,6 +112,11 @@ bool Gameplay::init()
 	grid->setPosition(ccp(296, 664));
 	addChild(grid);
 
+	timeLabel = CCLabelTTF::labelWithString("Time: 0", "Verdana",30);
+	timeLabel->setAnchorPoint(ccp(0.5f, 0.5f));
+	timeLabel->setPosition(ccp(grid->getContentSize().width * 0.5f,grid->getContentSize().height * 0.5f));
+	grid->addChild(timeLabel);
+
 	scoreText = CCLabelTTF::labelWithString("Score: 0", "Verdana",30);
 	scoreText->setAnchorPoint(ccp(0.0f, 0.5f));
 	scoreText->setPosition(ccp(50,hud->getContentSize().height/2.0f));
@@ -123,6 +128,7 @@ bool Gameplay::init()
 
 void Gameplay::initPhysicalWorld()
 {
+	totalTime = 0;
 	// Create Box2d world
 	b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
 	bool doSleep = false;
@@ -257,6 +263,8 @@ void Gameplay::updatePlanets(ccTime dt)
 
 void Gameplay::updatePhysic( ccTime dt )
 {
+	totalTime += dt;
+
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 	int32 velocityIterations = 8;
 	int32 positionIterations = 1;
@@ -350,7 +358,7 @@ void Gameplay::updatePhysic( ccTime dt )
 
 void Gameplay::update(ccTime dt) {
 	impulseTimer += dt;
-
+	updateScore();
 	Input::instance()->update();
 
 	if(Input::instance()->keyDown(VK_UP)) {
@@ -544,6 +552,8 @@ void Gameplay::updateScore()
 	char tab[255] = {0};
 	sprintf(tab, "Score: %i", mPlayer->score);
 	scoreText->setString(tab);
+	sprintf(tab, "Time: %.2f", totalTime);
+	timeLabel->setString(tab);
 }
 
 
