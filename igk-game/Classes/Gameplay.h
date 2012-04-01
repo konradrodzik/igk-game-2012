@@ -45,8 +45,8 @@ public:
 private:
 	CCSprite* mBackground;
 	b2World* mWorld;
-	CCSprite* mPlayer;
 	std::vector<Planet*> mPlanets;
+	Player* mPlayer;
 };
 
 #endif
