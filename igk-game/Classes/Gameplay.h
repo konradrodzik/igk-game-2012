@@ -12,6 +12,16 @@
 
 using namespace cocos2d;
 
+class Listener : public b2ContactListener
+{
+	/// Called when two fixtures begin to touch.
+	virtual void BeginContact(b2Contact* contact);
+
+	/// Called when two fixtures cease to touch.
+	virtual void EndContact(b2Contact* contact);
+
+};
+
 class Gameplay : public cocos2d::CCLayer {
 public:
 	Gameplay();
@@ -62,7 +72,7 @@ private:
 	CCNode* world;
 	Sun* sun;
 	CCLabelTTF* playerPos;
-
+	Listener *listener;
 	CCSprite* cursor;
 
 	float impulseTimer;
