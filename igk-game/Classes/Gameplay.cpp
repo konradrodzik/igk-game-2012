@@ -4,12 +4,23 @@
 #define PTM_RATIO (1.0f/32.0f)
 
 const int MaxPlanets = 70;
-const int MaxTrashes = 32;
+const int MaxTrashes = 60;
 const float MinPlanetDistance = 903;
 const float MinShowPlanetDistance = 1500;
 const float MaxPlanetDistance = 2000;
 const float PlanetsDistance = 200;
 const float BoundsDistance = 1640.0f;
+
+DWORD PlaySoundThread(void* ptr)
+{
+	PlaySoundA((const char*)ptr, NULL, 0);
+	return 0;
+}
+
+void PlaySoundThreaded(const char* ptr)
+{
+	// CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlaySoundThread, (LPVOID)ptr, 0, 0);
+}
 
 Gameplay::Gameplay() {
 	impulseFuel = 100;
@@ -126,7 +137,8 @@ bool Gameplay::init()
 	hud->setAnchorPoint(ccp(0.0f, 0.0f));
 	hud->setPosition(ccp(0,0));
 	addChild(hud);
-	
+	
+
 	for(int i = 0; i < 3; ++i) {
 		CCSprite* life = CCSprite::spriteWithFile("life.png");
 		mLifeSprites.push_back(life);
@@ -267,6 +279,8 @@ void Gameplay::updateRockets(ccTime dt)
 			quad->setPosition(rocketScreen);
 			quad->setDuration(0.4f);
 			world->addChild(quad);
+			PlaySoundThreaded("resources/explosion.mp3");
+
 						
 			removeRocket(i);
 			continue;
@@ -454,6 +468,8 @@ void Gameplay::updatePlanets(ccTime dt)
 
 			removePlanet(i);
 			
+			PlaySoundThreaded("resources/explosion.mp3");
+
 			//CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("explosion.mp3");
 			continue;
 		}
