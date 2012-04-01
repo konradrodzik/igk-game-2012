@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="resource">
+      <UniqueIdentifier>{dfb5dc74-bf83-4ff9-b7f2-1da33b29f483}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;png;manifest</Extensions>
+    </Filter>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{4dd7d6e5-6033-4dce-a344-0b6072559f65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\MenuScene">
+      <UniqueIdentifier>{08d4b34c-8bd2-403e-8880-bec57f33a76d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\WelcomeScene">
+      <UniqueIdentifier>{b780fc0a-0704-4b71-9e28-92f953eec819}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\Gameplay">
+      <UniqueIdentifier>{6448129a-192d-4013-985e-3efe38c8d3ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="other">
+      <UniqueIdentifier>{f30bfaa4-366b-44e3-82b7-80dd4a128c3a}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Classes\Utils">
+      <UniqueIdentifier>{dc935072-cb70-4e15-96a9-06ad4de6c044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\KeyboardHandling">
+      <UniqueIdentifier>{ab650261-694c-4869-b585-95efcaa2b281}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="win32\res\igk-game.ico">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\CloseSelected.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\CloseNormal.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\HelloWorld.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\sun.jpg">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\player.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\astro.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\BoilingFoam.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\BurstPipe.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Comet.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Comet.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\ExplodingRing.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\fire.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\fire-grayscale.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Flower.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Fog.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Galaxy.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\LavaFlow.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\moon.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\particles.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\particles-hd.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Phoenix.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\planet_01.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\planet_02.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\planet_03.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\snow.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\space.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Spiral.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\stars.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\stars2.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\stars2-grayscale.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\stars-grayscale.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\streak.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\sun.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\sun_static.png">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Upsidedown.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\Stars.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\trail.plist">
+      <Filter>resource</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="win32\igk-game.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Classes\MenuScene.h">
+      <Filter>Classes\MenuScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\AppDelegate.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\WelcomeScene.h">
+      <Filter>Classes\WelcomeScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Gameplay.h">
+      <Filter>Classes\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\resource.h">
+      <Filter>other</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\main.h">
+      <Filter>other</Filter>
+    </ClInclude>
+    <ClInclude Include="Sun.h">
+      <Filter>Classes\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Classes\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Planet.h">
+      <Filter>Classes\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="GLES-Render.h">
+      <Filter>Classes\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Common.h">
+      <Filter>Classes\KeyboardHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Input.h">
+      <Filter>Classes\KeyboardHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleFactory.h">
+      <Filter>Classes\Gameplay</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Classes\MenuScene.cpp">
+      <Filter>Classes\MenuScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\AppDelegate.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\WelcomeScene.cpp">
+      <Filter>Classes\WelcomeScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Gameplay.cpp">
+      <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\main.cpp">
+      <Filter>other</Filter>
+    </ClCompile>
+    <ClCompile Include="Sun.cpp">
+      <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Planet.cpp">
+      <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Input.cpp">
+      <Filter>Classes\KeyboardHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="GLES-Render.cpp">
+      <Filter>Classes\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleFactory.cpp">
+      <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
