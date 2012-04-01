@@ -10,6 +10,7 @@ const float MaxPlanetDistance = 2000;
 const float PlanetsDistance = 200;
 
 Gameplay::Gameplay() {
+	impulseFuel = 100;
 }
 
 Gameplay::~Gameplay() {
@@ -113,6 +114,13 @@ bool Gameplay::init()
 	grid->setPosition(ccp(296, size.height-664));
 	addChild(grid);
 
+	impulseFuelIndicator = CCLayerColor::layerWithColor(ccc4(1, 255, 1, 128));
+	impulseFuelIndicator->setAnchorPoint(ccp(0, 1));
+	impulseFuelIndicator->setContentSize(grid->getContentSize());
+	impulseFuelIndicator->setPosition(grid->getPosition());
+	impulseFuelIndicator->setPositionY(impulseFuelIndicator->getPositionY() - grid->getContentSize().height);
+	addChild(impulseFuelIndicator);
+	
 	timeLabel = CCLabelTTF::labelWithString("Time: 0", "Verdana",30);
 	timeLabel->setAnchorPoint(ccp(0.5f, 0.5f));
 	timeLabel->setPosition(ccp(grid->getContentSize().width * 0.5f,grid->getContentSize().height * 0.5f));
@@ -297,7 +305,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		// gravity
 		float bla;
 		float bla2;
-		float gravityForce = 98;
+		float gravityForce = 38;
 		b2Vec2 gravityVec;
 		b2Vec2 normalizedDistance = distance;
 		normalizedDistance.Normalize();
@@ -318,9 +326,13 @@ void Gameplay::updatePhysic( ccTime dt )
 	}
 
 	// engine force
-	CCPoint engineForceVectorCC = ccpForAngle(CC_DEGREES_TO_RADIANS(90 + mPlayer->mPlayer->getRotation()));
+	CCPoint engineForceVectorCC = mPlayer->direction;
 	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
-	engineForceVector *= 100;
+	if(drainImpulseFuel && impulseFuel > 0) {
+		engineForceVector *= 500;
+	} else {
+		engineForceVector *= 200;
+	}
 	globalForce += engineForceVector;
 
 	// sun gravity
@@ -328,7 +340,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	b2Vec2 sunPosition = b2Vec2(sun->getPosition().x * PTM_RATIO, sun->getPosition().y * PTM_RATIO);
 	b2Vec2 sunGravityVector = sunPosition - mPlayer->mPlayerBody->GetPosition();
 	float playerSunDistance = sunGravityVector.Length() - sunRadius;
-	if(playerSunDistance > 0)
+	//if(playerSunDistance > 0)
 	{
 		float maxSunDistance = size.width * PTM_RATIO + fabs(sun->getPositionX() * PTM_RATIO) - sunRadius;
 		float sunGravityFactor = playerSunDistance / maxSunDistance;
@@ -360,6 +372,27 @@ void Gameplay::updatePhysic( ccTime dt )
 void Gameplay::update(ccTime dt) {
 	impulseTimer += dt;
 	updateScore();
+	if(drainImpulseFuel) {
+		impulseFuel -= dt * 30;
+		if(impulseFuel < 0) {
+			impulseFuel = 0;
+		}
+	} else {
+		impulseFuel += dt * 10;
+		if(impulseFuel > 100) {
+			impulseFuel = 100;
+		}
+	}
+
+	if(impulseFuel < 20) {
+		impulseFuelIndicator->setColor(ccc3(255, 1, 1));
+	} else {
+		impulseFuelIndicator->setColor(ccc3(1, 255, 1));
+	}
+
+	impulseFuelIndicator->setContentSize(CCSizeMake(grid->getContentSize().width * (impulseFuel / 100.0f), 
+		impulseFuelIndicator->getContentSize().height));
+
 	Input::instance()->update();
 
 	if(Input::instance()->keyDown(VK_UP)) {
@@ -555,6 +588,7 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	world->addChild(cursor);
 
 	playerLookAt(cursor->getPosition());
+	drainImpulseFuel = true;
 }
 
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
@@ -570,6 +604,7 @@ void Gameplay::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
 	playerLookAt(cursor->getPosition());
 	world->removeChild(cursor, false);
+	drainImpulseFuel = false;
 }
 
 void Gameplay::updateScore()
