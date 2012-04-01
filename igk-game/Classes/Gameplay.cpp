@@ -3,7 +3,7 @@
 #include "SimpleAudioEngine.h"
 #define PTM_RATIO (1.0f/32.0f)
 
-const int MaxPlanets = 40;
+const int MaxPlanets = 70;
 const int MaxTrashes = 32;
 const float MinPlanetDistance = 903;
 const float MinShowPlanetDistance = 1500;
@@ -191,7 +191,7 @@ void Gameplay::initPhysicalWorld()
 	m_debugDraw->SetFlags(flags);	
 }
 
-bool Gameplay::outsideView(const CCPoint &pos, float* distance2, b2Vec2* normalized)
+bool Gameplay::outsideView(const CCPoint &pos, float* distance2, b2Vec2* normalized, bool inner)
 {
 	b2Vec2 posCenter(pos.x, pos.y);
 	b2Vec2 sunCenter = b2Vec2(sun->getPosition().x, sun->getPosition().y);
@@ -203,8 +203,16 @@ bool Gameplay::outsideView(const CCPoint &pos, float* distance2, b2Vec2* normali
 		*normalized = (sunCenter - posCenter);
 		normalized->Normalize();
 	}
-	if(distance < MinPlanetDistance || MaxPlanetDistance < distance)
-		return true;
+	if(inner)
+	{
+		if(distance < MinPlanetDistance || BoundsDistance < distance)
+			return true;
+	}
+	else
+	{
+		if(distance < MinPlanetDistance || MaxPlanetDistance < distance)
+			return true;
+	}
 	return false;
 }
 
@@ -595,6 +603,11 @@ void Gameplay::updatePhysic( ccTime dt )
 	//		mPlayer->mPlayer->setRotation(angle);
 	//	}
 	//}
+
+	if(outsideView(mPlayer->mOptimizedPos2, NULL, NULL, true))
+	{
+		showGameOver();
+	}
 }
 
 void Gameplay::update(ccTime dt) {
@@ -647,7 +660,7 @@ void Gameplay::update(ccTime dt) {
 			float angle = mPlayer->mPlayer->getRotation() * M_PI / 180.0f;
 			float speed = 500.0f;
 			addRocket("rocket.png", mPlayer->mPlayer->getPosition(), CCPoint(speed * sinf(angle), speed * cosf(angle)));
-			nextRocketTimer = -5;
+			nextRocketTimer = -0.25f;
 		}
 	}
 
@@ -673,6 +686,8 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer = new Player;
 	mPlayer->mPlayer = CCSprite::spriteWithFile("astro.png");
 	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
+	mPlayer->mOptimizedPos = ccp(position.x, position.y);
+	mPlayer->mOptimizedPos2 = ccp(position.x, position.y);
 	world->addChild(mPlayer->mPlayer, 3);
 
 	// PHYSICAL REPRESENTATION
