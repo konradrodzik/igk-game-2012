@@ -10,6 +10,7 @@ const float MaxPlanetDistance = 2000;
 const float PlanetsDistance = 200;
 
 Gameplay::Gameplay() {
+	impulseFuel = 100;
 }
 
 Gameplay::~Gameplay() {
@@ -111,6 +112,13 @@ bool Gameplay::init()
 	grid->setAnchorPoint(ccp(0,1));
 	grid->setPosition(ccp(296, 664));
 	addChild(grid);
+
+	impulseFuelIndicator = CCLayerColor::layerWithColor(ccc4(1, 255, 1, 128));
+	impulseFuelIndicator->setAnchorPoint(ccp(0, 1));
+	impulseFuelIndicator->setContentSize(grid->getContentSize());
+	impulseFuelIndicator->setPosition(grid->getPosition());
+	impulseFuelIndicator->setPositionY(impulseFuelIndicator->getPositionY() - grid->getContentSize().height);
+	addChild(impulseFuelIndicator);
 
 	scoreText = CCLabelTTF::labelWithString("Score: 0", "Verdana",30);
 	scoreText->setAnchorPoint(ccp(0.0f, 0.5f));
@@ -311,7 +319,11 @@ void Gameplay::updatePhysic( ccTime dt )
 	// engine force
 	CCPoint engineForceVectorCC = mPlayer->direction;
 	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
-	engineForceVector *= 200;
+	if(drainImpulseFuel && impulseFuel > 0) {
+		engineForceVector *= 500;
+	} else {
+		engineForceVector *= 200;
+	}
 	globalForce += engineForceVector;
 
 	// sun gravity
@@ -350,6 +362,27 @@ void Gameplay::updatePhysic( ccTime dt )
 
 void Gameplay::update(ccTime dt) {
 	impulseTimer += dt;
+
+	if(drainImpulseFuel) {
+		impulseFuel -= dt * 30;
+		if(impulseFuel < 0) {
+			impulseFuel = 0;
+		}
+	} else {
+		impulseFuel += dt * 10;
+		if(impulseFuel > 100) {
+			impulseFuel = 100;
+		}
+	}
+
+	if(impulseFuel < 20) {
+		impulseFuelIndicator->setColor(ccc3(255, 1, 1));
+	} else {
+		impulseFuelIndicator->setColor(ccc3(1, 255, 1));
+	}
+
+	impulseFuelIndicator->setContentSize(CCSizeMake(grid->getContentSize().width * (impulseFuel / 100.0f), 
+		impulseFuelIndicator->getContentSize().height));
 
 	Input::instance()->update();
 
@@ -522,6 +555,7 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	world->addChild(cursor);
 
 	playerLookAt(cursor->getPosition());
+	drainImpulseFuel = true;
 }
 
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
@@ -537,6 +571,7 @@ void Gameplay::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
 	playerLookAt(cursor->getPosition());
 	world->removeChild(cursor, false);
+	drainImpulseFuel = false;
 }
 
 void Gameplay::updateScore()
