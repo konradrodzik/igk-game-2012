@@ -73,7 +73,12 @@ private:
 	CCLabelTTF* timeLabel;
 	std::vector<CCSprite*> mLifeSprites;
 	CCParticleSystem *trail;
+	
 	ccTime totalTime;
+	
+	float impulseFuel;
+	bool drainImpulseFuel;
+	CCLayerColor* impulseFuelIndicator;
 };
 
 #endif
