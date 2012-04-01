@@ -72,6 +72,10 @@ private:
 	CCLabelTTF* scoreText;
 	std::vector<CCSprite*> mLifeSprites;
 	CCParticleSystem *trail;
+
+	float impulseFuel;
+	bool drainImpulseFuel;
+	CCLayerColor* impulseFuelIndicator;
 };
 
 #endif
