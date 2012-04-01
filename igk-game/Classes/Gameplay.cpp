@@ -43,6 +43,7 @@ CCScene* Gameplay::scene()
 
 bool Gameplay::init() 
 {
+	gameIsPlaying = 1;
 	CocosDenshion::SimpleAudioEngine::sharedEngine()->preloadEffect("explosion.mp3");
 	setIsTouchEnabled(true);
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
@@ -386,7 +387,7 @@ void Gameplay::updatePlanets(ccTime dt)
 
 			removePlanet(i);
 			
-			CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("explosion.mp3");
+			//CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("explosion.mp3");
 			continue;
 		}
 
@@ -483,7 +484,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		float maxRadius = planet->maxGravityRadius;
 
 		// rotating force
-		float force = 1000;
+		float force = 800;
 		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
 		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
 		forceVector.Normalize();
@@ -492,7 +493,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		// gravity
 		float bla;
 		float bla2;
-		float gravityForce = 98;
+		float gravityForce = 100;
 		b2Vec2 gravityVec;
 		b2Vec2 normalizedDistance = distance;
 		normalizedDistance.Normalize();
@@ -515,10 +516,10 @@ void Gameplay::updatePhysic( ccTime dt )
 	// engine force
 	CCPoint engineForceVectorCC = mPlayer->direction;
 	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
-	if(drainImpulseFuel && impulseFuel > 0) {
-		engineForceVector *= 800;
+	if(drainImpulseFuel) {
+		engineForceVector *= 400;
 	} else {
-		engineForceVector *= 200;
+		engineForceVector *= 100;
 	}
 	globalForce += engineForceVector;
 
@@ -531,7 +532,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	{
 		float maxSunDistance = size.width * PTM_RATIO + fabs(sun->getPositionX() * PTM_RATIO) - sunRadius;
 		float sunGravityFactor = playerSunDistance / maxSunDistance;
-		float sunGravityForce = 800 * sunGravityFactor;
+		float sunGravityForce = 400 * sunGravityFactor;
 
 		sunGravityVector.Normalize();
 
@@ -554,26 +555,26 @@ void Gameplay::updatePhysic( ccTime dt )
 
 	//mPlayer->mPlayer->setRotation(mPlayer->mPlayerBody->GetAngle());
 
-	if(!drainImpulseFuel) 
-	{
-		b2Vec2 velocityVec = mPlayer->mPlayerBody->GetLinearVelocity();
-		if(velocityVec.Length() > 0) 
-		{
-			CCPoint velVect = ccp(velocityVec.x, velocityVec.y);
-			velVect = ccpNormalize(velVect);
-			mPlayer->direction = velVect;
+	//if(!drainImpulseFuel) 
+	//{
+	//	b2Vec2 velocityVec = mPlayer->mPlayerBody->GetLinearVelocity();
+	//	if(velocityVec.Length() > 0) 
+	//	{
+	//		CCPoint velVect = ccp(velocityVec.x, velocityVec.y);
+	//		velVect = ccpNormalize(velVect);
+	//		mPlayer->direction = velVect;
 
-			float angle = -CC_RADIANS_TO_DEGREES(ccpToAngle(velVect));
-			mPlayer->mPlayer->setRotation(angle);
-		}
-	}
+	//		float angle = -CC_RADIANS_TO_DEGREES(ccpToAngle(velVect));
+	//		mPlayer->mPlayer->setRotation(angle);
+	//	}
+	//}
 }
 
 void Gameplay::update(ccTime dt) {
 	impulseTimer += dt;
 	updateScore();
 	if(drainImpulseFuel) {
-		impulseFuel -= dt * 30;
+		impulseFuel -= dt * 20;
 		if(impulseFuel < 0) {
 			impulseFuel = 0;
 		}
@@ -622,6 +623,7 @@ void Gameplay::update(ccTime dt) {
 	updatePhysic(dt);
 
  	trail->setPosition(mPlayer->mPlayer->getPosition());
+	//trail->setGravity(ccpMult(mPlayer->direction, 10));
 }
 
 void Gameplay::createPlayer(float posx, float posy)
@@ -843,6 +845,9 @@ void Gameplay::removeAchievement(CCNode *label)
 
 void Gameplay::showAchievement(const char *achievementName)
 {
+	if (!gameIsPlaying) {
+		return;
+	}
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 	CCLabelTTF *label = CCLabelTTF::labelWithString(achievementName, "Comic Sans", 48);
 	label->setPosition(ccp(size.width * 0.5f, size.height * 0.5f));
@@ -856,6 +861,35 @@ void Gameplay::showAchievement(const char *achievementName)
 	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
 	CCDelayTime *delayTime = CCDelayTime::actionWithDuration(0.2f);
 
+	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, NULL);
+	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
+	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
+	label->runAction(sequence);
+}
+
+void Gameplay::showGameOver()
+{
+	if (!gameIsPlaying) {
+		return;
+	}
+	unscheduleUpdate();
+	gameIsPlaying = 0;
+	CCLayerColor *layer = new CCLayerColor();
+	layer->initWithColor(ccc4(40, 40, 40, 255));
+	CCSize size = CCDirector::sharedDirector()->getWinSize();
+	CCLabelTTF *label = CCLabelTTF::labelWithString("GAME OVER", "Comic Sans", 72);
+	label->setPosition(ccp(size.width * 0.5f, size.height * 0.5f));
+	label->setColor(ccc3(128,255, 0));
+	this->addChild(layer);
+	layer->addChild(label, 4);
+
+	CCFadeIn *fadeIn = CCFadeIn::actionWithDuration(0.2f);
+	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(1.0f, 4, 4);
+	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(1.0f, rand() % 60 - 30);
+	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(1.0f);
+	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
+	CCDelayTime *delayTime = CCDelayTime::actionWithDuration(0.2f);
+	
 	CCFiniteTimeAction *spawn = CCSpawn::actions(fadeIn, NULL);
 	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
 	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);

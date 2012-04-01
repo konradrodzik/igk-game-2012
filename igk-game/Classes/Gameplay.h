@@ -41,7 +41,7 @@ public:
 
 	void update(ccTime dt);
 
-
+	void showGameOver();
 	void updatePlanets(ccTime dt);
 	void updateTrash(ccTime dt);
 	void removePlanet(int i);
@@ -65,8 +65,8 @@ public:
 	void removeAchievement(CCNode *label);
 	void showAchievement(const char*);
 
-	void jetpackCallback( CCNode* node, void* obj );
-	void explosionCallback( CCNode* node, void* obj );
+	
+
 
 private:
 	CCSprite* mBackground;
@@ -79,6 +79,7 @@ private:
 	CCLabelTTF* playerPos;
 	Listener *listener;
 	CCSprite* cursor;
+	int gameIsPlaying;
 
 	float impulseTimer;
 

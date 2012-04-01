@@ -402,7 +402,7 @@ bool CCParticleMeteor::initWithTotalParticles(unsigned int numberOfParticles)
 		//modeA.gravity = ccp(-200,200);
 
 		// Gravity Mode: speed of particles
-		modeA.speed = 15;
+		modeA.speed = 60;
 		modeA.speedVar = 5;
 
 		// Gravity Mode: radial
