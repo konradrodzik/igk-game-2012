@@ -44,11 +44,15 @@ public:
 	void showGameOver();
 	void updatePlanets(ccTime dt);
 	void updateTrash(ccTime dt);
+	void updateRockets(ccTime dt);
 	void removePlanet(int i);
+	void removeTrash(int i);
+	void removeRocket(int i);
 	bool outsideView(const CCPoint &pos, float* distance = NULL, b2Vec2* normalized = NULL);
 	bool hasPlanetsNear(const CCPoint &pos, float radius);
 	
 	Planet* addPlanet(std::string planetSpriteName, CCPoint position);
+	Rocket* addRocket(std::string rocketSpriteName, CCPoint position, CCPoint velocity);
 
 	void clearLevel();
 
@@ -65,13 +69,14 @@ public:
 	void removeAchievement(CCNode *label);
 	void showAchievement(const char*);
 
-	
+	void collide(Rocket* rocket, Trash* trash);
 
 private:
 	CCSprite* mBackground;
 	b2World* mWorld;
 	std::vector<Planet*> mPlanets;
 	std::vector<Trash*> mTrashes;
+	std::vector<Rocket*> mRockets;
 	Player* mPlayer;
 	CCNode* world;
 	Sun* sun;
@@ -79,6 +84,7 @@ private:
 	Listener *listener;
 	CCSprite* cursor;
 	int gameIsPlaying;
+	float nextRocketTimer;
 
 	float impulseTimer;
 
@@ -94,6 +100,9 @@ private:
 	float impulseFuel;
 	bool drainImpulseFuel;
 	CCLayerColor* impulseFuelIndicator;
+
+public:
+	static Gameplay* gayplay;
 };
 
 #endif
