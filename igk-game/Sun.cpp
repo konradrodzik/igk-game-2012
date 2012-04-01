@@ -3,7 +3,7 @@
 
 Sun::Sun(void)
 {
-	initWithFile("sun.jpg");
+	initWithFile("sun.png");
 }
 
 Sun::~Sun(void)
