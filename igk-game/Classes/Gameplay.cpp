@@ -280,7 +280,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		// gravity
 		float bla;
 		float bla2;
-		float gravityForce = 98;
+		float gravityForce = 38;
 		b2Vec2 gravityVec;
 		b2Vec2 normalizedDistance = distance;
 		normalizedDistance.Normalize();
@@ -301,9 +301,9 @@ void Gameplay::updatePhysic( ccTime dt )
 	}
 
 	// engine force
-	CCPoint engineForceVectorCC = ccpForAngle(CC_DEGREES_TO_RADIANS(90 + mPlayer->mPlayer->getRotation()));
+	CCPoint engineForceVectorCC = mPlayer->direction;
 	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
-	engineForceVector *= 100;
+	engineForceVector *= 200;
 	globalForce += engineForceVector;
 
 	// sun gravity
@@ -311,7 +311,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	b2Vec2 sunPosition = b2Vec2(sun->getPosition().x * PTM_RATIO, sun->getPosition().y * PTM_RATIO);
 	b2Vec2 sunGravityVector = sunPosition - mPlayer->mPlayerBody->GetPosition();
 	float playerSunDistance = sunGravityVector.Length() - sunRadius;
-	if(playerSunDistance > 0)
+	//if(playerSunDistance > 0)
 	{
 		float maxSunDistance = size.width * PTM_RATIO + fabs(sun->getPositionX() * PTM_RATIO) - sunRadius;
 		float sunGravityFactor = playerSunDistance / maxSunDistance;

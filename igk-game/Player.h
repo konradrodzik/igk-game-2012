@@ -22,7 +22,8 @@ public:
 	CCPoint mOptimizedPos;
 	CCPoint mOptimizedPos2;
 	float mLastAngle;
-	
+	
+
 	int score;
 };
 
