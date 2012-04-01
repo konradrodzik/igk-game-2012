@@ -65,6 +65,8 @@ public:
 	void removeAchievement(CCNode *label);
 	void showAchievement(const char*);
 
+	
+
 private:
 	CCSprite* mBackground;
 	b2World* mWorld;

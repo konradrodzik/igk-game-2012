@@ -127,7 +127,7 @@ bool Gameplay::init()
 	//particleSystem->setPosition(screenSize.width / 2, screenSize.height / 2);
 	//world->addChild(particleSystem, 1);
 	trail = ParticleFactory::meteor(); 
-	trail->setPositionType(kCCPositionTypeRelative);
+	//trail->setPositionType(kCCPositionTypeRelative);
 	trail->setPosition(mPlayer->mPlayer->getPosition());
 	trail->setDuration(20.0f);
 	world->addChild(trail, 1);
@@ -447,16 +447,16 @@ void Gameplay::updatePhysic( ccTime dt )
 		float maxRadius = planet->maxGravityRadius;
 
 		// rotating force
-		float force = 1000;
+		float force = 400;
 		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
 		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
 		forceVector.Normalize();
-		b2Vec2 F = force * forceVector;
+		b2Vec2 F = b2Vec2_zero;// force * forceVector;
 
 		// gravity
 		float bla;
 		float bla2;
-		float gravityForce = 98;
+		float gravityForce = 100;
 		b2Vec2 gravityVec;
 		b2Vec2 normalizedDistance = distance;
 		normalizedDistance.Normalize();
@@ -480,9 +480,9 @@ void Gameplay::updatePhysic( ccTime dt )
 	CCPoint engineForceVectorCC = mPlayer->direction;
 	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
 	if(drainImpulseFuel && impulseFuel > 0) {
-		engineForceVector *= 800;
+		engineForceVector *= 400;
 	} else {
-		engineForceVector *= 200;
+		engineForceVector *= 100;
 	}
 	globalForce += engineForceVector;
 
@@ -495,7 +495,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	{
 		float maxSunDistance = size.width * PTM_RATIO + fabs(sun->getPositionX() * PTM_RATIO) - sunRadius;
 		float sunGravityFactor = playerSunDistance / maxSunDistance;
-		float sunGravityForce = 800 * sunGravityFactor;
+		float sunGravityForce = 400 * sunGravityFactor;
 
 		sunGravityVector.Normalize();
 
@@ -537,7 +537,7 @@ void Gameplay::update(ccTime dt) {
 	impulseTimer += dt;
 	updateScore();
 	if(drainImpulseFuel) {
-		impulseFuel -= dt * 30;
+		impulseFuel -= dt * 20;
 		if(impulseFuel < 0) {
 			impulseFuel = 0;
 		}
@@ -586,6 +586,7 @@ void Gameplay::update(ccTime dt) {
 	updatePhysic(dt);
 
  	trail->setPosition(mPlayer->mPlayer->getPosition());
+	trail->setGravity(ccpMult(mPlayer->direction, 10));
 }
 
 void Gameplay::createPlayer(float posx, float posy)
