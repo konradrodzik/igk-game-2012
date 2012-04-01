@@ -5,6 +5,7 @@
 #include "GLES-Render.h"
 #include "Sun.h"
 #include "Planet.h"
+#include "Player.h"
 #include "Box2D/Box2D.h"
 
 
@@ -41,8 +42,8 @@ public:
 private:
 	CCSprite* mBackground;
 	b2World* mWorld;
-	CCSprite* mPlayer;
 	std::vector<Planet*> mPlanets;
+	Player* mPlayer;
 };
 
 #endif

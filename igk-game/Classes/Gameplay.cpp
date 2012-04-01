@@ -62,9 +62,8 @@ void Gameplay::initPhysicalWorld()
 	// Create Box2d world
 	b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
 	bool doSleep = false;
-	//mWorld = new b2World(gravity, doSleep);
 	mWorld = new b2World(gravity);
-	//mWorld->SetContinuousPhysics(true);
+	mWorld->SetContinuousPhysics(true);
 
 	// Debug Draw functions
 	GLESDebugDraw* m_debugDraw = new GLESDebugDraw( PTM_RATIO );
@@ -82,32 +81,27 @@ void Gameplay::updatePhysic( ccTime dt )
 	int32 positionIterations = 1;
 
 	mWorld->Step(dt, velocityIterations, positionIterations);
-	/*
-	for (b2Body* b = mWorld->GetBodyList(); b; b = b->GetNext())
-	{
-		b2Body* ground = planet->GetBody();
-		b2CircleShape* circle = (b2CircleShape*)planet->GetShape();
-		// Get position of our "Planet"
-		b2Vec2 center = ground->GetWorldPoint(circle->m_p);
-		// Get position of our current body in the iteration
-		b2Vec2 position = b->GetPosition();
-		// Get the distance between the two objects.	
-		b2Vec2 d = center - position;
-		// The further away the objects are, the weaker the gravitational force is
-		float force = 250.0f / d.LengthSquared(); // 150 can be changed to adjust the amount of force
-		d.Normalize();
-		b2Vec2 F = force * d;
+
+	for(int i = 0; i < mPlanets.size(); ++i) {
+		Planet* planet = mPlanets[i];
+		b2Body* planetBody = planet->mPlanetBody;
+		b2CircleShape* planetShape = (b2CircleShape*)planet->mPlanetFixture->GetShape();
+
+		b2Vec2 planetCenter = planetBody->GetWorldPoint(planetShape->m_p);
+
+		b2Vec2 distance = planetCenter - mPlayer->mPlayerBody->GetPosition();
+
+		float force = 250.0f / distance.LengthSquared(); // 150 can be changed to adjust the amount of force
+		distance.Normalize();
+		b2Vec2 F = force * distance;
 		// Finally apply a force on the body in the direction of the "Planet"
-		b->ApplyForce(F, position);
+		mPlayer->mPlayerBody->ApplyForce(F, mPlayer->mPlayerBody->GetPosition());
 
-		if (b->GetUserData() != NULL) {
-			CCSprite *myActor = (CCSprite*)b->GetUserData();
-			myActor.position = CGPointMake( b->GetPosition().x * PTM_RATIO, b->GetPosition().y * PTM_RATIO);
-			myActor.rotation = -1 * CC_RADIANS_TO_DEGREES(b->GetAngle());
-		}	
-	}*/
+
+		mPlayer->mPlayer->setPosition(ccp( mPlayer->mPlayerBody->GetPosition().x * PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y * PTM_RATIO));
+		mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
+	}
 }
-
 
 void Gameplay::update(ccTime dt) {
 	updatePhysic(dt);
@@ -117,28 +111,32 @@ void Gameplay::createPlayer(float posx, float posy)
 {
 	// CREATE SPRITE
 	CCPoint position = ccp(posx, posy);
-	mPlayer = CCSprite::spriteWithFile("CloseNormal.png");
-	mPlayer->setPosition(ccp(position.x, position.y));
-	addChild(mPlayer);
+	mPlayer = new Player;
+	mPlayer->mPlayer = CCSprite::spriteWithFile("astro.png");
+	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
+	addChild(mPlayer->mPlayer);
 
 	// PHYSICAL REPRESENTATION
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-
 	bodyDef.position.Set(position.x/PTM_RATIO, position.y/PTM_RATIO);
 	bodyDef.userData = mPlayer;
 	b2Body *body = mWorld->CreateBody(&bodyDef);
 
 	// Define another box shape for our dynamic body.
 	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(.5f, .5f);//These are mid points for our 1m box
+	dynamicBox.SetAsBox(0.5f, 0.5f);
+	//dynamicBox.SetAsBox(mPlayer->getContentSize().width / 2.0f / PTM_RATIO, mPlayer->getContentSize().height / 2.0f / PTM_RATIO);//These are mid points for our 1m box
 
 	// Define the dynamic body fixture.
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &dynamicBox;	
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.3f;
-	body->CreateFixture(&fixtureDef);
+	b2Fixture* playerFixture = body->CreateFixture(&fixtureDef);
+
+	mPlayer->mPlayerBody = body;
+	mPlayer->mPlayerFixture = playerFixture;
 }
 
 void Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
@@ -157,8 +155,8 @@ void Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	b2Body* planetBody = mWorld->CreateBody(&planetBodyDef);
 
 	b2CircleShape shape;
-	shape.m_radius = 1.0f;
-	shape.m_p.Set(8.0f, 8.0f);
+	shape.m_radius = planet->getSprite()->getContentSize().width / 2 / PTM_RATIO;
+	//shape.m_p.Set(8.0f, 8.0f);
 	b2FixtureDef fd;
 	fd.shape = &shape;
 	b2Fixture* planetFixture = planetBody->CreateFixture(&fd);
