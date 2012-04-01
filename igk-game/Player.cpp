@@ -12,6 +12,10 @@ score = 0;
 	mOptimizedPos = CCPoint(0,0);
 	mOptimizedPos2 = CCPoint(0,0);
 	mLastAngle = 0;
+
+
+
+
 }
 
 

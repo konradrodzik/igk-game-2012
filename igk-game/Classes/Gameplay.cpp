@@ -124,6 +124,14 @@ bool Gameplay::init()
 	hud->setAnchorPoint(ccp(0.0f, 0.0f));
 	hud->setPosition(ccp(0,0));
 	addChild(hud);
+	
+	for(int i = 0; i < 3; ++i) {
+		CCSprite* life = CCSprite::spriteWithFile("life.png");
+		mLifeSprites.push_back(life);
+		life->setPosition(ccp(hud->getContentSize().width-3*(10+life->getContentSize().width) + i*(10+life->getContentSize().width), hud->getContentSize().height/2.0f));
+		hud->addChild(life);
+	}
+
 
 	//CCParticleSystem *particleSystem = ParticleFactory::stars();
 	//particleSystem->setPosition(screenSize.width / 2, screenSize.height / 2);
@@ -133,19 +141,12 @@ bool Gameplay::init()
 	trail->setPosition(mPlayer->mPlayer->getPosition());
 	trail->setDuration(20.0f);
 	world->addChild(trail, 1);
-	/*for(int i = 0; i < 3; ++i) {
-		mLifeSprites[0] = CCSprite::spriteWithFile("life.png");
-	}
+
 	
-	mLifeSprites[1] = CCSprite::spriteWithFile("life.png");
-	mLifeSprites[2] = CCSprite::spriteWithFile("life.png");
-	hud->addChild(mLifeSprites[0]);
-	hud->addChild(mLifeSprites[0]);
-	hud->addChild(mLifeSprites[0]);*/
 
 	grid = CCSprite::spriteWithFile("siatka.png");
 	grid->setAnchorPoint(ccp(0,1));
-	grid->setPosition(ccp(296, 664));
+	grid->setPosition(ccp(296, size.height-664));
 	addChild(grid);
 
 	impulseFuelIndicator = CCLayerColor::layerWithColor(ccc4(1, 255, 1, 128));
@@ -164,6 +165,23 @@ bool Gameplay::init()
 	scoreText->setAnchorPoint(ccp(0.0f, 0.5f));
 	scoreText->setPosition(ccp(50,hud->getContentSize().height/2.0f));
 	hud->addChild(scoreText);
+
+
+	// Init explosion anim
+	/*CCSprite* mExplosionAnimTexture;
+	CCAnimation* mExplosionpakAnimation;
+	mExplosionAnimTexture = new CCSprite;
+	mExplosionAnimTexture->initWithFile("explosion.png");
+	mExplosionpakAnimation = new CCAnimation();
+	mExplosionpakAnimation->initWithFrames(NULL, 0.03f);
+	for(int y = 0; y < 7; ++y) {
+		for(int x = 0; x < 8; ++x) {
+			float width = 256;
+			float height = 256.0f;
+			CCSpriteFrame* frame = CCSpriteFrame::frameWithTexture(mExplosionAnimTexture->getTexture(), CCRect(x*width, y*height, width, height));
+			mExplosionpakAnimation->addFrame(frame);
+		}
+	}*/
 
 	return true;
 }
@@ -239,6 +257,21 @@ void Gameplay::updateTrash(ccTime dt)
 			quad->setPosition(trashScreen);
 			quad->setDuration(0.4f);
 			world->addChild(quad);
+			
+			
+			/*CCSprite* explosion = CCSprite::spriteWithTexture(mExplosionAnimTexture->getTexture());
+			world->addChild(explosion);
+			 
+				
+			
+			CCActionInterval* expAction = CCAnimate::actionWithAnimation(mExplosionpakAnimation);
+			CCCallFuncND* callfunc = CCCallFuncND::actionWithTarget(this, callfuncND_selector(Gameplay::explosionCallback), NULL);
+			CCSequence* seq = CCSequence::actionOneTwo(expAction, callfunc);
+			explosion->stopAllActions();
+			explosion->setIsVisible(true);
+			explosion->runAction(seq);*/
+			
+
 
 			world->removeChild(mTrashes[i]->getSprite(), true);
 			mWorld->DestroyBody(mTrashes[i]->mTrashBody);
@@ -602,6 +635,27 @@ void Gameplay::createPlayer(float posx, float posy)
 	mPlayer->mPlayer->setPosition(ccp(position.x, position.y));
 	world->addChild(mPlayer->mPlayer, 3);
 
+	/*// Jetpack animation
+	mJetpakAnimTexture = CCSprite::spriteWithFile("jetpack.png");
+	mJetpakAnimation = new CCAnimation();
+	mJetpakAnimation->initWithFrames(NULL, 0.03f);
+	for(int y = 0; y < 4; ++y) {
+		for(int x = 0; x < 8; ++x) {
+			float width = 256;
+			float height = 256.0f;
+			CCSpriteFrame* frame = CCSpriteFrame::frameWithTexture(mJetpakAnimTexture->getTexture(), CCRect(x*width, y*height, width, height));
+			mJetpakAnimation->addFrame(frame);
+		}
+	}
+
+	mJetpakAnimTexture->setAnchorPoint(ccp(0.5f, 0.5f));
+	mJetpakAnimTexture->setPosition(ccp(14, 36));
+	world->addChild(mJetpakAnimTexture, 2);
+	mJetpakAnimTexture->setIsVisible(false);
+	*/
+	
+
+
 	// PHYSICAL REPRESENTATION
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
@@ -732,8 +786,22 @@ void Gameplay::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 	cursor->setPosition(p);
 	world->addChild(cursor);
 
+
 	playerLookAt(cursor->getPosition());
 	drainImpulseFuel = true;
+}
+
+void Gameplay::jetpackCallback( CCNode* node, void* obj )
+{
+	
+}
+
+void Gameplay::explosionCallback( CCNode* node, void* obj )
+{
+	CCNode* kurwa = (CCNode*)obj;
+	kurwa->stopAllActions();
+	kurwa->setIsVisible(false);
+	world->removeChild(kurwa, true);
 }
 
 void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)

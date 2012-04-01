@@ -67,6 +67,7 @@ public:
 
 	
 
+
 private:
 	CCSprite* mBackground;
 	b2World* mWorld;
@@ -94,6 +95,12 @@ private:
 	float impulseFuel;
 	bool drainImpulseFuel;
 	CCLayerColor* impulseFuelIndicator;
+
+	//CCSprite* mJetpakAnimTexture;
+	//CCAnimation* mJetpakAnimation;
+
+	//CCSprite* mExplosionAnimTexture;
+	//CCAnimation* mExplosionpakAnimation;
 };
 
 #endif
