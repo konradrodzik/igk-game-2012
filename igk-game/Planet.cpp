@@ -4,6 +4,10 @@ Planet::Planet( std::string planetSpriteName )
 {
 	planetSprite = new CCSprite;
 	planetSprite->initWithFile(planetSpriteName.c_str());
+
+	gravityRadius = 10.0f;
+	mPlanetBody = NULL;
+	mPlanetFixture = NULL;
 }
 
 Planet::~Planet()
@@ -23,6 +27,14 @@ void Planet::setPos( CCPoint pos )
 {
 	if(planetSprite) {
 		planetSprite->setPosition(pos);
+	}
+}
+
+void Planet::setAngle(float angle)
+{
+	if(planetSprite)
+	{
+		planetSprite->setRotation(angle);	
 	}
 }
 
