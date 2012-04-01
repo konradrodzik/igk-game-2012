@@ -415,7 +415,7 @@ bool CCParticleMeteor::initWithTotalParticles(unsigned int numberOfParticles)
 
 		// angle
 		m_fAngle = 90;
-		m_fAngleVar = 360;
+		m_fAngleVar = 60;
 
 		// emitter position
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
