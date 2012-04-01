@@ -49,6 +49,8 @@ public:
 	virtual void ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent);
 	virtual void ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent);
 
+	void updateScore();
+
 	void removeAchievement(CCNode *label);
 	void showAchievement(const char*);
 
@@ -64,6 +66,11 @@ private:
 	CCSprite* cursor;
 
 	float impulseTimer;
+
+	CCSprite* hud;
+	CCSprite* grid;
+	CCLabelTTF* scoreText;
+	std::vector<CCSprite*> mLifeSprites;
 	CCParticleSystem *trail;
 };
 
