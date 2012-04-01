@@ -64,9 +64,10 @@ bool Gameplay::init()
 	CCSize screenSize = CCDirector::sharedDirector()->getWinSize();
 	createPlayer(screenSize.width/2, screenSize.height/2);
 	
-	//addPlanet("planet_01.png", ccp(500, 100));
+	addPlanet("planet_01.png", ccp(800, 100));
 	addPlanet("planet_02.png", ccp(500, 300));
-	//addPlanet("planet_03.png", ccp(500, 600));
+	addPlanet("planet_03.png", ccp(800, 600));
+
 
 	return true;
 }
