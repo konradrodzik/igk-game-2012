@@ -3,7 +3,7 @@
 
 #define PTM_RATIO (1.0f/32.0f)
 
-const int MaxPlanets = 64;
+const int MaxPlanets = 40;
 const int MaxTrashes = 32;
 const float MinPlanetDistance = 903;
 const float MinShowPlanetDistance = 1500;
@@ -13,6 +13,7 @@ const float BoundsDistance = 1640.0f;
 
 Gameplay::Gameplay() {
 	impulseFuel = 100;
+	drainImpulseFuel = false;
 }
 
 Gameplay::~Gameplay() {
@@ -455,7 +456,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		// gravity
 		float bla;
 		float bla2;
-		float gravityForce = 38;
+		float gravityForce = 98;
 		b2Vec2 gravityVec;
 		b2Vec2 normalizedDistance = distance;
 		normalizedDistance.Normalize();
@@ -479,14 +480,14 @@ void Gameplay::updatePhysic( ccTime dt )
 	CCPoint engineForceVectorCC = mPlayer->direction;
 	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
 	if(drainImpulseFuel && impulseFuel > 0) {
-		engineForceVector *= 500;
+		engineForceVector *= 800;
 	} else {
 		engineForceVector *= 200;
 	}
 	globalForce += engineForceVector;
 
 	// sun gravity
-	float sunRadius = 800 * PTM_RATIO;
+	float sunRadius = 500 * PTM_RATIO;
 	b2Vec2 sunPosition = b2Vec2(sun->getPosition().x * PTM_RATIO, sun->getPosition().y * PTM_RATIO);
 	b2Vec2 sunGravityVector = sunPosition - mPlayer->mPlayerBody->GetPosition();
 	float playerSunDistance = sunGravityVector.Length() - sunRadius;
@@ -494,7 +495,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	{
 		float maxSunDistance = size.width * PTM_RATIO + fabs(sun->getPositionX() * PTM_RATIO) - sunRadius;
 		float sunGravityFactor = playerSunDistance / maxSunDistance;
-		float sunGravityForce = 500 * sunGravityFactor;
+		float sunGravityForce = 800 * sunGravityFactor;
 
 		sunGravityVector.Normalize();
 
@@ -515,8 +516,21 @@ void Gameplay::updatePhysic( ccTime dt )
 
 	mPlayer->mPlayer->setPosition(mPlayer->mOptimizedPos2);
 
-	//float oldRotation  = mPlayer->mPlayer->getRotation();
-	//mPlayer->mPlayer->setRotation(-1 * CC_RADIANS_TO_DEGREES(mPlayer->mPlayerBody->GetAngle()));
+	//mPlayer->mPlayer->setRotation(mPlayer->mPlayerBody->GetAngle());
+
+	if(!drainImpulseFuel) 
+	{
+		b2Vec2 velocityVec = mPlayer->mPlayerBody->GetLinearVelocity();
+		if(velocityVec.Length() > 0) 
+		{
+			CCPoint velVect = ccp(velocityVec.x, velocityVec.y);
+			velVect = ccpNormalize(velVect);
+			mPlayer->direction = velVect;
+
+			float angle = -CC_RADIANS_TO_DEGREES(ccpToAngle(velVect));
+			mPlayer->mPlayer->setRotation(angle);
+		}
+	}
 }
 
 void Gameplay::update(ccTime dt) {
