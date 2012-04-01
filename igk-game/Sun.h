@@ -9,5 +9,13 @@ class Sun : public CCSprite
 public:
 	Sun(void);
 	~Sun(void);
+	
+	void createSunAnimation();
+	void playBurnAnim();
+
+	CCSprite* sunAnimSprite;
+	CCAnimation* sunAnimation;
+
+
 };
 

@@ -14,8 +14,10 @@ public:
 
 	void setPos(CCPoint pos);
 	void setAngle(float angle);
+	void setGravityRadius(float radius);
 
 	CCSprite* planetSprite;
+	CCSprite* gravitySprite;
 	float gravityRadius;
 	float maxGravityRadius;
 	// Physical representation
