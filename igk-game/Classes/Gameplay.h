@@ -6,14 +6,17 @@
 #include "Sun.h"
 #include "Planet.h"
 #include "Player.h"
-#include "Box2D/Box2D.h"
+
+#include "Box2D/Box2D.h"
 
 
 
 using namespace cocos2d;
 
 class Gameplay : public cocos2d::CCLayer {
+	CCNode* world;
 	Sun* sun;
+	Player* player;
 
 public:
 	Gameplay();
