@@ -42,8 +42,13 @@ public:
 	void clearLevel();
 
 	void draw();
+	void playerJetpack();
+	void playerLookAt(CCPoint p);
 
 	virtual void ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent);
+	virtual void ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent);
+	virtual void ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent);
+
 	void removeAchievement(CCNode *label);
 	void showAchievement(const char*);
 
@@ -55,6 +60,8 @@ private:
 	CCNode* world;
 	Sun* sun;
 	CCLabelTTF* playerPos;
+
+	CCSprite* cursor;
 
 	float impulseTimer;
 	CCParticleSystem *trail;
