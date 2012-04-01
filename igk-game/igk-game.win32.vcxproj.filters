@@ -137,6 +137,12 @@
     <None Include="Resources\Upsidedown.plist">
       <Filter>resource</Filter>
     </None>
+    <None Include="Resources\Stars.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\trail.plist">
+      <Filter>resource</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="win32\igk-game.rc">
