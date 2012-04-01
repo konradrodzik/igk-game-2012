@@ -40,7 +40,7 @@ bool Gameplay::init()
 	mBackground = CCSprite::spriteWithFile("space.png");
 	mBackground->setAnchorPoint(ccp(0,0));
 	mBackground->setPosition(ccp(0,0));
-	//addChild(mBackground);
+	addChild(mBackground);
 
 	player = new Player();
 	player->setPosition(ccp(size.width / 2, size.height / 2));
