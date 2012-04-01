@@ -130,12 +130,14 @@
     <None Include="Resources\Comet.plist" />
     <None Include="Resources\Comet.png" />
     <None Include="Resources\ExplodingRing.plist" />
+    <None Include="Resources\explosion.mp3" />
     <None Include="Resources\fire-grayscale.png" />
     <None Include="Resources\fire.png" />
     <None Include="Resources\Flower.plist" />
     <None Include="Resources\Fog.png" />
     <None Include="Resources\Galaxy.plist" />
     <None Include="Resources\HelloWorld.png" />
+    <None Include="Resources\launchedJetpack.wav" />
     <None Include="Resources\LavaFlow.plist" />
     <None Include="Resources\moon.png" />
     <None Include="Resources\particles-hd.png" />
