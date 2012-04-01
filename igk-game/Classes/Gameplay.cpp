@@ -134,7 +134,8 @@ void Gameplay::initPhysicalWorld()
 	bool doSleep = false;
 	mWorld = new b2World(gravity);
 	mWorld->SetContinuousPhysics(true);
-
+	listener = new Listener();
+	mWorld->SetContactListener(listener);
 	// Debug Draw functions
 	GLESDebugDraw* m_debugDraw = new GLESDebugDraw( PTM_RATIO );
 	mWorld->SetDebugDraw(m_debugDraw);
@@ -589,4 +590,14 @@ void Gameplay::showAchievement(const char *achievementName)
 	CCFiniteTimeAction *spawn2 = CCSpawn::actions(fadeOut, rotateBy, scaleBy, NULL);
 	CCFiniteTimeAction *sequence = CCSequence::actions(spawn, delayTime, spawn2, callFunc, NULL);
 	label->runAction(sequence);
+}
+
+void Listener::BeginContact(b2Contact* contact)
+{
+
+}
+
+void Listener::EndContact(b2Contact* contact)
+{
+
 }
