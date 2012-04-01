@@ -61,7 +61,7 @@ bool Gameplay::init()
 	// setup sun
 	sun = new Sun();
 	sun->setPosition(ccp(-sun->getContentSize().width / 2 + 400, world->getContentSize().height / 2));
-	world->addChild(sun);
+	world->addChild(sun, 100);
 	world->addChild(playerPos);
 
 	// setup world rotation around sun
@@ -364,8 +364,8 @@ Planet* Gameplay::addPlanet( std::string planetSpriteName, CCPoint position )
 	planet->setPos(position);
 	world->addChild(planet->getSprite());
 
-	planet->gravityRadius = planet->getSprite()->getContentSize().width * PTM_RATIO;
-	planet->maxGravityRadius = 2*planet->gravityRadius;
+	// inside we are multiplying by PTM
+	planet->setGravityRadius(planet->getSprite()->getContentSize().width);
 
 	mPlanets.push_back(planet);
 
