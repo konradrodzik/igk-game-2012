@@ -3,7 +3,7 @@
 
 Player::Player(void)
 {
-	
+	score = 0;
 }
 
 

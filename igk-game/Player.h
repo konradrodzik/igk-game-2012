@@ -15,5 +15,7 @@ public:
 	CCSprite* mPlayer;
 	b2Body* mPlayerBody;
 	b2Fixture* mPlayerFixture;
+
+	int score;
 };
 

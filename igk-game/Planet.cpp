@@ -13,7 +13,6 @@ Planet::Planet( std::string planetSpriteName )
 	CCSize planetSize = planetSprite->getContentSize();
 	gravitySprite->setPosition(ccp(planetSize.width/2.0f, planetSize.height/2.0f));
 
-
 	planetSprite->addChild(gravitySprite);
 
 	CCFadeOut* fadeout = CCFadeOut::actionWithDuration(1.5f);
@@ -56,8 +55,10 @@ void Planet::setAngle(float angle)
 
 void Planet::setGravityRadius( float radius )
 {
-	gravityRadius = planetSprite->getContentSize().width * PTM_RATIO;
-	maxGravityRadius = 2*gravityRadius;
+	//int factor = (radius + 2*radius);
+	//int randomRadius = rand()%factor + radius;
+	gravityRadius = radius * PTM_RATIO;
+	maxGravityRadius = gravityRadius*radius;
 
 	// change scale of gravity radius sprite
 	float gravitySpriteSize = gravitySprite->getContentSize().width;

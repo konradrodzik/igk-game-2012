@@ -77,10 +77,30 @@ bool Gameplay::init()
 	CCSize screenSize = CCDirector::sharedDirector()->getWinSize();
 	createPlayer(screenSize.width/2, screenSize.height/2);
 	
-	//addPlanet("planet_01.png", ccp(500, 100));
-	//addPlanet("planet_02.png", ccp(500, 200));
-	//addPlanet("planet_03.png", ccp(500, 300));
+	hud = CCSprite::spriteWithFile("gui.png");
+	hud->setAnchorPoint(ccp(0.0f, 0.0f));
+	hud->setPosition(ccp(0,0));
+	addChild(hud);
 
+	/*for(int i = 0; i < 3; ++i) {
+		mLifeSprites[0] = CCSprite::spriteWithFile("life.png");
+	}
+	
+	mLifeSprites[1] = CCSprite::spriteWithFile("life.png");
+	mLifeSprites[2] = CCSprite::spriteWithFile("life.png");
+	hud->addChild(mLifeSprites[0]);
+	hud->addChild(mLifeSprites[0]);
+	hud->addChild(mLifeSprites[0]);*/
+
+	grid = CCSprite::spriteWithFile("siatka.png");
+	grid->setAnchorPoint(ccp(0,1));
+	grid->setPosition(ccp(296, 664));
+	addChild(grid);
+
+	scoreText = CCLabelTTF::labelWithString("Score: 0", "Verdana",30);
+	scoreText->setAnchorPoint(ccp(0.0f, 0.5f));
+	scoreText->setPosition(ccp(50,hud->getContentSize().height/2.0f));
+	hud->addChild(scoreText);
 
 	return true;
 }
@@ -206,14 +226,16 @@ void Gameplay::updatePlanets(ccTime dt)
 		const float AngleDiff = 2.0f * M_PI / 30.0f;
 		const float AngularMin = 60.0f / 180.0f * M_PI;
 		const float AngularMax = 180.0f / 180.0f * M_PI;
-		const float VelocityMin = 1 * PTM_RATIO;
-		const float VelocityMax = 3 * PTM_RATIO;
+		const float VelocityMin = 0.25 * PTM_RATIO;
+		const float VelocityMax = 1.0f * PTM_RATIO;
+
+		int directionLeft = rand()%2;
 		
 		angle = 2 * M_PI * (float)rand() / RAND_MAX;
 		float vel = VelocityMin + (float)rand() / RAND_MAX * (VelocityMax - VelocityMin);
 		float avel = AngularMin + (float)rand() / RAND_MAX * (AngularMax - AngularMin);
 		planetObj->mPlanetBody->SetLinearVelocity(b2Vec2(cos(angle) * -vel, sin(angle) * -vel));
-		planetObj->mPlanetBody->SetAngularVelocity(avel);
+		planetObj->mPlanetBody->SetAngularVelocity(avel * directionLeft==0 ? -1 : 1);
 	}
 }
 
@@ -444,4 +466,11 @@ void Gameplay::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
 void Gameplay::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
 
+}
+
+void Gameplay::updateScore()
+{	
+	char tab[255] = {0};
+	sprintf(tab, "Score: %i", mPlayer->score);
+	scoreText->setString(tab);
 }

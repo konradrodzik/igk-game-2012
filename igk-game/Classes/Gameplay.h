@@ -46,6 +46,8 @@ public:
 	virtual void ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent);
 	virtual void ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent);
 
+	void updateScore();
+
 private:
 	CCSprite* mBackground;
 	b2World* mWorld;
@@ -56,6 +58,11 @@ private:
 	CCLabelTTF* playerPos;
 
 	float impulseTimer;
+
+	CCSprite* hud;
+	CCSprite* grid;
+	CCLabelTTF* scoreText;
+	std::vector<CCSprite*> mLifeSprites;
 };
 
 #endif
