@@ -19,6 +19,7 @@ public:
 	CCPoint mLastVel;
 	CCPoint mOptimizedVel;
 	CCPoint mOptimizedPos;
+	CCPoint mOptimizedPos2;
 	float mLastAngle;
 };
 

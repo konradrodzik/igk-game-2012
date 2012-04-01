@@ -251,10 +251,14 @@ void Gameplay::updatePhysic( ccTime dt )
 		// gravity
 		float bla;
 		float bla2;
-		float gravityForce = 100;
+		float gravityForce = 5;
+		float angularForce = 2; // mPlayer->mPlayerBody->GetLinearVelocity().Length();
 		b2Vec2 gravityVec;
 		b2Vec2 normalizedDistance = distance;
 		normalizedDistance.Normalize();
+		
+		float dist = (distanceLength - planet->gravityRadius) / planet->maxGravityRadius;
+
 #if 0
 		if(distanceLength < planet->maxGravityRadius) {
 			bla = distanceLength / planet->maxGravityRadius;
@@ -267,13 +271,16 @@ void Gameplay::updatePhysic( ccTime dt )
 #else
 		if(distanceLength < planet->gravityRadius) {
 			bla = distanceLength / planet->gravityRadius; 
-			gravityVec = bla*gravityForce*b2Vec2(-normalizedDistance.x, -normalizedDistance.y);
-			gravityVec += bla*gravityForce*b2Vec2(-normalizedDistance.y, normalizedDistance.x);
-		} else if(distanceLength < planet->maxGravityRadius) {
-			bla = (distanceLength - planet->gravityRadius) / (planet->maxGravityRadius - planet->gravityRadius);
-			// bla2 = -pow(2*bla-1, 2) + 1;
-			gravityVec = bla*gravityForce*b2Vec2(normalizedDistance.x, normalizedDistance.y);
-			// gravityVec += bla*gravityForce*b2Vec2(-normalizedDistance.y, normalizedDistance.x);
+			gravityVec = -gravityForce*distanceLength*b2Vec2(normalizedDistance.x, normalizedDistance.y);
+			gravityVec += 0.1f * angularForce*distanceLength*b2Vec2(-normalizedDistance.y, normalizedDistance.x);
+			gravityVec += planet->mPlanetBody->GetLinearVelocity();
+			// mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
+		} else
+		if(distanceLength < planet->maxGravityRadius) {
+			gravityVec = gravityForce*distanceLength*b2Vec2(normalizedDistance.x, normalizedDistance.y);
+			gravityVec += 0.1f * angularForce*distanceLength*b2Vec2(-normalizedDistance.y, normalizedDistance.x);
+			gravityVec += planet->mPlanetBody->GetLinearVelocity();
+			// mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
 #endif
 		} else {
 			gravityVec = b2Vec2_zero;
@@ -284,9 +291,11 @@ void Gameplay::updatePhysic( ccTime dt )
 	}
 
 	// Finally apply a force on the body in the direction of the "Planet"
-	mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
+	// mPlayer->mPlayerBody->SetLinearVelocity(b2Vec2(0,0));
 	mPlayer->mPlayerBody->SetAngularVelocity(0);
+	// mPlayer->mPlayerBody->SetLinearVelocity(globalForce);
 	mPlayer->mPlayerBody->ApplyForceToCenter(globalForce);
+	// mPlayer->mPlayerBody->SetLinearVelocity(mPlayer->mPlayerBody->GetLinearVelocity() + globalForce);
 
 	CCPoint pos(mPlayer->mPlayerBody->GetPosition().x / PTM_RATIO, mPlayer->mPlayerBody->GetPosition().y / PTM_RATIO);
 
@@ -309,12 +318,14 @@ void Gameplay::updatePhysic( ccTime dt )
 	}
 	float t = 1.0f - expf(- dt / 0.5f);
 	float tt = 1.0f - expf(- dt / 2.0f);
+	float ttt = 1.0f - expf(- dt / 0.2f);
 	mPlayer->mOptimizedVel = ccpLerp(mPlayer->mOptimizedVel, mPlayer->mLastVel, t);
 	// mPlayer->mLastAngle = mPlayer->mLastAngle * (1.0f - t) + angle * t;
 	if(mPlayer && mPlayer->mPlayer)
 		mPlayer->mPlayer->setRotation(90.0f + CC_RADIANS_TO_DEGREES(-ccpToAngle(mPlayer->mOptimizedVel)));
 	mPlayer->mOptimizedPos = ccpLerp(mPlayer->mOptimizedPos, mPlayer->mLastPos, tt);
-	mPlayer->mPlayer->setPosition(pos);
+	mPlayer->mOptimizedPos2 = ccpLerp(mPlayer->mOptimizedPos2, mPlayer->mLastPos, ttt);
+	mPlayer->mPlayer->setPosition(mPlayer->mOptimizedPos2);
 }
 
 void Gameplay::update(ccTime dt) {
@@ -334,6 +345,12 @@ void Gameplay::update(ccTime dt) {
 
 	if(Input::instance()->keyDown(VK_RIGHT)) {
 		mPlayer->mPlayer->setPositionX(mPlayer->mPlayer->getPositionX() + 100 * dt);
+	}
+
+	if(Input::instance()->keyDown(VK_SPACE)) {
+		b2Vec2 dir = b2Vec2(mPlayer->mOptimizedVel.x * PTM_RATIO, mPlayer->mOptimizedVel.y * PTM_RATIO);
+		dir.Normalize();
+		mPlayer->mPlayerBody->ApplyForceToCenter(10.0f * dir);
 	}
 
 	CCPoint sub = ccpSub(mPlayer->mOptimizedPos, sun->getPosition());
