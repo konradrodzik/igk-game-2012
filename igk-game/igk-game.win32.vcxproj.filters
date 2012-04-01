@@ -143,6 +143,12 @@
     <None Include="Resources\trail.plist">
       <Filter>resource</Filter>
     </None>
+    <None Include="Resources\launchedJetpack.wav">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="Resources\explosion.mp3">
+      <Filter>resource</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="win32\igk-game.rc">
