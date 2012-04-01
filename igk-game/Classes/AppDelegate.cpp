@@ -7,6 +7,7 @@ using namespace CocosDenshion;
 
 #include "Gameplay.h"
 #include "WelcomeScene.h"
+#include "Input.h"
 
 #include "CCEGLView.h"
 
@@ -33,6 +34,8 @@ bool AppDelegate::initInstance()
 		CCEGLView * pMainWnd = new CCEGLView();
 		CC_BREAK_IF(! pMainWnd
 				|| ! pMainWnd->Create(TEXT("cocos2d: Hello World"), 1024, 768));
+
+		Input::instance()->init((HINSTANCE)GetWindowLong(pMainWnd->getHWnd(), GWL_HINSTANCE), false );
 
 #endif  // CC_PLATFORM_WIN32
 

@@ -6,7 +6,7 @@
 
 using namespace cocos2d;
 
-class Gameplay : public cocos2d::CCLayerColor {
+class Gameplay : public cocos2d::CCLayer {
 	CCNode* world;
 	Sun* sun;
 
@@ -23,6 +23,8 @@ public:
 	void update(ccTime dt);
 
 	virtual void ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent);
+	virtual void ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent);
+	virtual void ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent);
 };
 
 #endif

@@ -21,6 +21,9 @@
       <UniqueIdentifier>{f30bfaa4-366b-44e3-82b7-80dd4a128c3a}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
     </Filter>
+    <Filter Include="Classes\KeyboardHandling">
+      <UniqueIdentifier>{ab650261-694c-4869-b585-95efcaa2b281}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\res\igk-game.ico">
@@ -69,6 +72,12 @@
     <ClInclude Include="Player.h">
       <Filter>Classes\Gameplay</Filter>
     </ClInclude>
+    <ClInclude Include="Classes\Common.h">
+      <Filter>Classes\KeyboardHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Input.h">
+      <Filter>Classes\KeyboardHandling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Classes\MenuScene.cpp">
@@ -91,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Classes\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Input.cpp">
+      <Filter>Classes\KeyboardHandling</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
