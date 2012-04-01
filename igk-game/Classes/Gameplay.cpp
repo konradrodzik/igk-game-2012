@@ -639,9 +639,9 @@ void Gameplay::showAchievement(const char *achievementName)
 	this->addChild(label, 4);
 
 	CCFadeIn *fadeIn = CCFadeIn::actionWithDuration(0.2f);
-	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(0.4f, 4, 4);
-	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(0.4f, rand() % 60 - 30);
-	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(0.4f);
+	CCScaleBy *scaleBy = CCScaleBy::actionWithDuration(1.0f, 4, 4);
+	CCRotateBy *rotateBy = CCRotateBy::actionWithDuration(1.0f, rand() % 60 - 30);
+	CCFadeOut *fadeOut = CCFadeOut::actionWithDuration(0.5f);
 	CCCallFuncN *callFunc = CCCallFuncN::actionWithTarget(this, callfuncN_selector(Gameplay::removeAchievement));
 	CCDelayTime *delayTime = CCDelayTime::actionWithDuration(0.2f);
 
