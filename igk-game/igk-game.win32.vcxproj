@@ -125,6 +125,7 @@
     <None Include="Resources\CloseNormal.png" />
     <None Include="Resources\CloseSelected.png" />
     <None Include="Resources\HelloWorld.png" />
+    <None Include="Resources\player.png" />
     <None Include="Resources\sun.jpg" />
     <None Include="win32\res\igk-game.ico" />
   </ItemGroup>

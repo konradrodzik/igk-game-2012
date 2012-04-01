@@ -3,12 +3,14 @@
 
 #include "cocos2d.h"
 #include "Sun.h"
+#include "Player.h"
 
 using namespace cocos2d;
 
 class Gameplay : public cocos2d::CCLayer {
 	CCNode* world;
 	Sun* sun;
+	Player* player;
 
 public:
 	Gameplay();
