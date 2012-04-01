@@ -353,7 +353,7 @@ void Gameplay::updatePlanets(ccTime dt)
 
 			removePlanet(i);
 			
-			CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("explosion.mp3");
+			//CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("explosion.mp3");
 			continue;
 		}
 
@@ -450,7 +450,7 @@ void Gameplay::updatePhysic( ccTime dt )
 		float maxRadius = planet->maxGravityRadius;
 
 		// rotating force
-		float force = 400;
+		float force = 800;
 		force = clampf(1-(distanceLength)/maxRadius, 0, 1) * force;
 		b2Vec2 forceVector = b2Vec2(-distance.y, distance.x);
 		forceVector.Normalize();
@@ -482,7 +482,7 @@ void Gameplay::updatePhysic( ccTime dt )
 	// engine force
 	CCPoint engineForceVectorCC = mPlayer->direction;
 	b2Vec2 engineForceVector = b2Vec2(engineForceVectorCC.x, engineForceVectorCC.y);
-	if(drainImpulseFuel && impulseFuel > 0) {
+	if(drainImpulseFuel) {
 		engineForceVector *= 400;
 	} else {
 		engineForceVector *= 100;
