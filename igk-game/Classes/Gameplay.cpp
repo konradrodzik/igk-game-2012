@@ -3,22 +3,23 @@
 #include "SimpleAudioEngine.h"
 #define PTM_RATIO (1.0f/32.0f)
 
-const int MaxPlanets = 70;
-const int MaxTrashes = 60;
+const int MaxPlanets = 80;
+const int MaxTrashes = 30;
 const float MinPlanetDistance = 903;
-const float MinShowPlanetDistance = 1500;
-const float MaxPlanetDistance = 2000;
+const float MinShowPlanetDistance = 1900;
+const float MaxPlanetDistance = 2300;
 const float PlanetsDistance = 200;
 const float BoundsDistance = 1640.0f;
 
 DWORD PlaySoundThread(void* ptr)
 {
-	PlaySoundA((const char*)ptr, NULL, 0);
 	return 0;
 }
 
 void PlaySoundThreaded(const char* ptr)
 {
+	// CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect(ptr);
+	// PlaySoundA((const char*)ptr, NULL, SND_FILENAME | SND_ASYNC);
 	// CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)PlaySoundThread, (LPVOID)ptr, 0, 0);
 }
 
@@ -56,16 +57,22 @@ CCScene* Gameplay::scene()
 
 bool Gameplay::init() 
 {
+	// CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect(ptr);
+
 	gameIsPlaying = 1;
-	CocosDenshion::SimpleAudioEngine::sharedEngine()->preloadEffect("explosion.mp3");
+	// CocosDenshion::SimpleAudioEngine::sharedEngine()->preloadEffect("explosion.mp3");
+	// CocosDenshion::SimpleAudioEngine::sharedEngine()->preloadEffect("launchedJetpack.wav");
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("sleepaway.mp3", true);
 	setIsTouchEnabled(true);
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
 	impulseTimer = 2;
 
+#if 0
 	playerPos = CCLabelTTF::labelWithString("text", "Verdana", 16);
 	playerPos->setAnchorPoint(ccp(0,0));
 	playerPos->setPosition(ccp(100, 100));
+#endif
 
 	world = CCNode::node();
 	world->setContentSize(size);
@@ -89,7 +96,7 @@ bool Gameplay::init()
 	sun = new Sun();
 	sun->setPosition(ccp(-sun->getContentSize().width / 2 + 400, world->getContentSize().height / 2));
 	world->addChild(sun);
-	world->addChild(playerPos);
+	/// world->addChild(playerPos);
 
 	// setup world rotation around sun
 	float sunAnchorPositionX = (sun->getPositionX())  / world->getContentSize().width;
@@ -153,7 +160,7 @@ bool Gameplay::init()
 	trail = ParticleFactory::meteor(); 
 	trail->setPositionType(kCCPositionTypeRelative);
 	trail->setPosition(mPlayer->mPlayer->getPosition());
-	trail->setDuration(20.0f);
+	trail->setDuration(10000.0f);
 	world->addChild(trail, 1);
 
 	
@@ -273,13 +280,13 @@ void Gameplay::updateRockets(ccTime dt)
 		float dist = 1.0f;
 		b2Vec2 normalized;
 
-		if(outsideView(rocketScreen, &dist, &normalized))
+		if(outsideView(rocketScreen, &dist, &normalized, true))
 		{
 			CCParticleSystemQuad* quad = ParticleFactory::explosion();
 			quad->setPosition(rocketScreen);
 			quad->setDuration(0.4f);
 			world->addChild(quad);
-			PlaySoundThreaded("resources/explosion.mp3");
+			// PlaySoundThreaded("explosion.mp3");
 
 						
 			removeRocket(i);
@@ -302,22 +309,22 @@ void Gameplay::updateRockets(ccTime dt)
 		rocket->mRocketBody->ApplyForceToCenter(normalized);
 		rocket->mRocketTrail->setPosition(rocketScreen);
 
-		for(int i = 0; i < mPlanets.size(); ++i)
+#if 0
+		for(int j = 0; j < mPlanets.size(); ++j)
 		{
-			Planet* planet = mPlanets[i];
+			Planet* planet = mPlanets[j];
 			b2Vec2 planetCenter = planet->mPlanetBody->GetPosition();
-			CCPoint planetScreen(planetCenter.x / PTM_RATIO, planetCenter.y / PTM_RATIO);
-			float distance = ccpDistance(rocketScreen, planetScreen);
+			b2Vec2 sub = planetCenter - rocketCenter;
+			float distance = sub.Normalize();
 
 			if(distance > planet->maxGravityRadius)
 				continue;
 
 			distance /= planet->maxGravityRadius;
 
-			CCPoint velocity = ccpNormalize(ccpSub(planetScreen, rocketScreen));
-
-			rocket->mRocketBody->ApplyForceToCenter(10.0f / distance / distance * b2Vec2(velocity.x, velocity.y));
+			rocket->mRocketBody->ApplyForceToCenter(100.0f * sub);
 		}
+#endif
 	}
 }
 
@@ -468,7 +475,7 @@ void Gameplay::updatePlanets(ccTime dt)
 
 			removePlanet(i);
 			
-			PlaySoundThreaded("resources/explosion.mp3");
+			// PlaySoundThreaded("explosion.mp3");
 
 			//CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("explosion.mp3");
 			continue;
@@ -482,7 +489,7 @@ void Gameplay::updatePlanets(ccTime dt)
 		dist *= 3.0f;
 		dist += 0.8f;
 
-		float force = 5000.0f / (dist);
+		float force = 10000.0f / (dist);
 
 		normalized.x *= force;
 		normalized.y *= force;
@@ -718,10 +725,14 @@ void Gameplay::update(ccTime dt) {
 	float angle =  CC_RADIANS_TO_DEGREES(ccpToAngle(sub));
 	world->setRotation(angle);
 
+
+#if 00
 	char buf[256];
 	sprintf(buf, "%f %f", mPlayer->mPlayer->getPositionX(), mPlayer->mPlayer->getPositionY());
 	playerPos->setString(buf);
-	
+#endif
+
+
 	updatePhysic(dt);
 
  	trail->setPosition(mPlayer->mPlayer->getPosition());
@@ -954,6 +965,8 @@ void Gameplay::playerJetpack()
 		b2Vec2 direction = b2Vec2(dir.x, dir.y);
 		direction *= 10;
 		mPlayer->mPlayerBody->ApplyLinearImpulse(direction, mPlayer->mPlayerBody->GetPosition());
+		
+		PlaySoundThreaded("launchedJetpack.wav");
 	}
 }
 
